@@ -87,10 +87,12 @@ function categoryImage(cat: Category): string | undefined {
 const CategoryExpertise: React.FC<CategoryExpertiseProps> = ({ onClose }) => {
     const { data: categoriesData } = useGetCategoriesQuery({});
     const apiCategories: Category[] = categoriesData?.data || [];
-    const categories: Category[] = apiCategories.length > 0 ? apiCategories : FALLBACK_CATEGORIES;
+    /* Six, always. The row is built for six columns, so a seventh would start a
+       second row holding one lonely tile. */
+    const categories: Category[] = (apiCategories.length > 0 ? apiCategories : FALLBACK_CATEGORIES).slice(0, 7);
 
     return (
-        <section className="w-full bg-white border-b border-gray-100">
+        <section className="w-full">
             <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-5">
 
                 {/* Header row */}
@@ -100,7 +102,7 @@ const CategoryExpertise: React.FC<CategoryExpertiseProps> = ({ onClose }) => {
                             className="w-[3px] h-5 rounded-full"
                             style={{ background: 'var(--color-primary)' }}
                         />
-                        <h2 className="text-sm sm:text-base font-bold text-gray-800 tracking-tight">
+                        <h2 className="text-sm sm:text-base font-semibold text-gray-800 tracking-tight">
                             Featured Categories
                         </h2>
                     </div>
@@ -126,7 +128,7 @@ const CategoryExpertise: React.FC<CategoryExpertiseProps> = ({ onClose }) => {
                 {/* Full-width grid — no carousel, no arrows. The column count is
                     chosen so a row of 6 or 8 categories fills the container exactly;
                     the tiles are square and stretch to whatever width is left over. */}
-                <div className="grid grid-cols-2 min-[480px]:grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3 sm:gap-4">
+                <div className="grid grid-cols-2 min-[480px]:grid-cols-3 sm:grid-cols-4 lg:grid-cols-7 gap-3 sm:gap-4">
                     {categories.map(cat => (
                         <Link
                             key={cat._id}
@@ -134,7 +136,7 @@ const CategoryExpertise: React.FC<CategoryExpertiseProps> = ({ onClose }) => {
                             className="group flex flex-col items-center gap-2.5"
                         >
                             {/* Icon tile — square, fills its grid column */}
-                            <div className="relative w-full aspect-square rounded-2xl overflow-hidden transition-all duration-200 group-hover:shadow-lg">
+                            <div className="cat-tile relative w-full aspect-square overflow-hidden">
                                 {categoryImage(cat) ? (
                                     <Image
                                         src={categoryImage(cat)!}
@@ -143,7 +145,7 @@ const CategoryExpertise: React.FC<CategoryExpertiseProps> = ({ onClose }) => {
                                         // A tile is a fraction of the row on phones and
                                         // ~150px on desktop; never the full 400px source.
                                         sizes="(max-width: 640px) 25vw, (max-width: 1024px) 15vw, 150px"
-                                        className="object-cover select-none transition-transform duration-200 group-hover:scale-105"
+                                        className="object-contain p-4 sm:p-5 select-none transition-transform duration-200 group-hover:scale-105"
                                     />
                                 ) : (
                                     <span className="text-5xl sm:text-7xl select-none transition-transform duration-200 group-hover:scale-110">
@@ -153,7 +155,7 @@ const CategoryExpertise: React.FC<CategoryExpertiseProps> = ({ onClose }) => {
                             </div>
 
                             {/* Label */}
-                            <span className="w-full text-[12px] sm:text-[14px] font-semibold text-gray-700 text-center leading-snug transition-colors group-hover:text-[var(--color-primary)]">
+                            <span className="w-full text-[12px] sm:text-[13.5px] font-medium text-gray-600 text-center leading-snug transition-colors group-hover:text-[var(--color-primary)]">
                                 {cat.name}
                             </span>
                         </Link>

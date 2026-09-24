@@ -16,9 +16,12 @@ const DEFAULT_HERO_SIDE = '/banners/hero-side.png';
 /* Natural sizes: 1672×941 and 1254×1254. Splitting the row's width in the same
    1.777 : 1 ratio as their aspect ratios makes the two panels come out exactly
    the same height — including once the gap is subtracted, since both shrink by
-   the same proportion. */
-const MAIN_ASPECT = '1672 / 941';
-const SIDE_ASPECT = '1 / 1';
+   the same proportion.
+   Both heights are then trimmed by the same ~9% (941 → 856, 1 → 0.91) so the
+   band sits a little shorter; the images stay object-cover / object-center and
+   just crop a hair top and bottom. Scaling both by one factor keeps them level. */
+const MAIN_ASPECT = '1672 / 856';
+const SIDE_ASPECT = '100 / 91';
 
 interface HeroSlide {
     _id?: string;

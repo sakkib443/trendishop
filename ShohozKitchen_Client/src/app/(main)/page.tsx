@@ -1,6 +1,7 @@
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import HeroSection from '@/components/home/HeroSection';
+import HeroBackdrop from '@/components/home/HeroBackdrop';
 import CategoryExpertise from '@/components/home/CategoryExpertise';
 import NewHomePage from '@/components/home/NewHomePage';
 
@@ -25,14 +26,15 @@ export const metadata: Metadata = {
 export default function Home() {
   return (
     <div
-      className="min-h-screen"
+      className="relative isolate min-h-screen"
       style={{
         background:
-          'radial-gradient(55% 45% at 88% 0%, rgba(var(--color-primary-rgb), 0.06), transparent 70%),' +
-          'radial-gradient(45% 40% at 0% 22%, rgba(var(--color-primary-rgb), 0.04), transparent 70%),' +
-          '#F8FAFC',
+          'radial-gradient(60% 50% at 90% -5%, rgba(250, 204, 21, 0.06), transparent 70%),' +
+          'radial-gradient(50% 42% at 0% 18%, rgba(245, 158, 11, 0.035), transparent 72%),' +
+          'linear-gradient(180deg, #FFFFFF 0%, #FFFEF9 55%, #FFFCF2 100%)',
       }}
     >
+      <HeroBackdrop />
       <HeroSection />
       <CategoryExpertise />
       <Suspense fallback={<div className="min-h-[60vh]" />}>

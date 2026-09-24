@@ -131,8 +131,26 @@ const Header: React.FC = () => {
     const SHELL = 'shell';
 
     /** The square the action icons sit in. Height comes from --hd-control, the
-        same token the search field and EXPLORE ALL use, so all three line up. */
-    const iconBtn = "hd-pill w-[var(--hd-control)] h-[var(--hd-control)] rounded-[var(--hd-radius)] flex items-center justify-center transition-all duration-200 shrink-0";
+        same token the search field and EXPLORE ALL use, so all three line up.
+        Futuristic frosted glass: a translucent panel with a thin gold rim, a top
+        sheen and a glow that blooms on hover — a step up from the flat white
+        squares this used to be. */
+    const iconBtn = "group relative w-[var(--hd-control)] h-[var(--hd-control)] rounded-[var(--hd-radius)] flex items-center justify-center transition-all duration-300 shrink-0 hover:-translate-y-0.5";
+    const iconBtnStyle: React.CSSProperties = {
+        background: 'linear-gradient(150deg, rgba(255,255,255,0.18), rgba(255,255,255,0.05) 58%, rgba(203,132,59,0.12))',
+        border: '1px solid rgba(222,180,117,0.4)',
+        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.22), 0 6px 18px -8px rgba(0,0,0,0.55)',
+        backdropFilter: 'blur(6px)',
+        WebkitBackdropFilter: 'blur(6px)',
+    };
+    /** The warm bloom each control gets on hover. */
+    const iconGlow = (
+        <span
+            aria-hidden
+            className="pointer-events-none absolute inset-0 rounded-[var(--hd-radius)] opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+            style={{ background: 'radial-gradient(circle at 50% 118%, rgba(222,180,117,0.55), transparent 68%)' }}
+        />
+    );
 
     /** Counts come back from localStorage on the client, so the server renders
         zero and the first client render would not. Holding them until after
@@ -273,11 +291,13 @@ const Header: React.FC = () => {
                             {isAuthenticated && user ? (
                                 <div className="relative" ref={profileRef}>
                                     <button onClick={() => setIsProfileOpen(!isProfileOpen)}
-                                        className={`${iconBtn} bg-white hover:bg-white/90 cursor-pointer`}
+                                        className={`${iconBtn} cursor-pointer`}
+                                        style={iconBtnStyle}
                                         aria-label="Account">
+                                        {iconGlow}
                                         {user.avatar
-                                            ? <img src={user.avatar} alt="" className="w-7 h-7 rounded-full object-cover" />
-                                            : <FiUser size={22} strokeWidth={1.7} className="text-[#222]" />}
+                                            ? <img src={user.avatar} alt="" className="relative w-7 h-7 rounded-full object-cover" />
+                                            : <FiUser size={22} strokeWidth={1.7} className="relative text-white" />}
                                     </button>
 
                                     {isProfileOpen && (
@@ -309,22 +329,33 @@ const Header: React.FC = () => {
                                     )}
                                 </div>
                             ) : (
-                                <Link href="/login" className={`${iconBtn} bg-white hover:bg-white/90`} aria-label="Sign in">
-                                    <FiUser size={22} strokeWidth={1.7} className="text-[#222]" />
+                                <Link href="/login" className={iconBtn} style={iconBtnStyle} aria-label="Sign in">
+                                    {iconGlow}
+                                    <FiUser size={22} strokeWidth={1.7} className="relative text-white" />
                                 </Link>
                             )}
 
-                            <Link href="/cart" className={`${iconBtn} bg-white hover:bg-white/90 relative`} aria-label="Cart">
-                                <FiShoppingCart size={21} strokeWidth={1.8} className="text-[#222]" />
+                            <Link href="/cart" className={iconBtn} style={iconBtnStyle} aria-label="Cart">
+                                {iconGlow}
+                                <FiShoppingCart size={21} strokeWidth={1.8} className="relative text-white" />
                                 {cartBadge}
                             </Link>
 
                             {/* The reference puts a theme toggle in this gold square. There is no
                                 dark mode to toggle here — useTheme() carries store branding, not a
-                                colour scheme — so the slot holds the wishlist instead. */}
-                            <Link href={wishlistHref} className={`${iconBtn} cursor-pointer hover:brightness-95 relative`}
-                                style={{ background: 'var(--hd-gold-soft)' }} aria-label="Wishlist">
-                                <FiHeart size={21} strokeWidth={1.8} style={{ color: 'var(--hd-gold-deep)' }} />
+                                colour scheme — so the slot holds the wishlist instead. It wears a
+                                warmer gold rim than its neighbours so it reads as the accent. */}
+                            <Link href={wishlistHref} className={`${iconBtn} cursor-pointer`}
+                                style={{
+                                    background: 'linear-gradient(150deg, rgba(233,204,174,0.4), rgba(203,132,59,0.2))',
+                                    border: '1px solid rgba(222,180,117,0.6)',
+                                    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.3), 0 6px 18px -8px rgba(203,132,59,0.5)',
+                                    backdropFilter: 'blur(6px)',
+                                    WebkitBackdropFilter: 'blur(6px)',
+                                }}
+                                aria-label="Wishlist">
+                                {iconGlow}
+                                <FiHeart size={21} strokeWidth={1.8} className="relative" style={{ color: '#f2d3a6' }} />
                                 {countBadge(wishlistCount, 'var(--hd-gold-deep)')}
                             </Link>
                         </div>

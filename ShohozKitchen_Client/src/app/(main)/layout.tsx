@@ -1,6 +1,7 @@
 import Header from "@/components/layout/Header/Header";
 import NewFooter from "@/components/layout/Footer/NewFooter";
 import MobileBottomNav from "@/components/layout/MobileBottomNav";
+import QuickActionRail from "@/components/shared/QuickActionRail";
 import MarketingTags from "@/components/marketing/MarketingTags";
 import { getSiteContent } from "@/lib/siteContent.server";
 import { cleanMarketingIds } from "@/lib/marketing";
@@ -22,6 +23,7 @@ export default async function MainLayout({
             <main className="pb-[58px] sm:pb-0">
                 {children}
             </main>
+            <QuickActionRail />
             <NewFooter />
             <MobileBottomNav />
         </>

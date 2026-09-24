@@ -73,6 +73,20 @@ const FlashSale: React.FC = () => {
         return sorted.slice(0, 5);
     }, [pool, tab]);
 
+    /* With no campaign record configured there is no offer.endTime, and the row
+       showed no clock at all. The products carry their own offer window, so the
+       soonest one still in the future is what the sale actually ends on. */
+    const endsAt = useMemo(() => {
+        if (offer?.endTime) return offer.endTime as string;
+        const future = pool
+            .map((p) => p.offerEndDate)
+            .filter(Boolean)
+            .map((d: string) => new Date(d).getTime())
+            .filter((t: number) => Number.isFinite(t) && t > Date.now())
+            .sort((a: number, b: number) => a - b);
+        return future.length ? new Date(future[0]).toISOString() : '';
+    }, [offer, pool]);
+
     if (items.length === 0) return null;
 
     return (
@@ -83,7 +97,7 @@ const FlashSale: React.FC = () => {
                 <div className="flex flex-wrap items-center justify-between gap-4">
                     <div className="flex flex-wrap items-center gap-4">
                         <h2 className="fs-title">{offer?.title || 'Flash Sale'}</h2>
-                        {offer?.endTime && <Countdown endTime={offer.endTime} />}
+                        {endsAt && <Countdown endTime={endsAt} />}
                     </div>
                     <Link href={offer?.link || '/products?isOnSale=true'} className="fs-seeall">
                         See All
@@ -105,7 +119,7 @@ const FlashSale: React.FC = () => {
                 </div>
 
                 {/* ── Five cards, the same card the rest of the shop uses ──── */}
-                <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-5">
+                <div className="mt-5 grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
                     {items.map((p) => (
                         <NewProductCard
                             key={p._id}

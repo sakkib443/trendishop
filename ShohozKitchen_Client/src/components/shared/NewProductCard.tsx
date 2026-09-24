@@ -180,21 +180,27 @@ const NewProductCard: React.FC<NewProductCardProps> = ({ product }) => {
     const inStock = product.stock === undefined || product.stock > 0;
 
     return (
-        <div className='pc group relative flex h-full flex-col overflow-hidden rounded-[18px] bg-white transition-shadow duration-300'>
+        <div className='pc group relative flex h-full flex-col overflow-hidden bg-white transition-shadow duration-300'>
 
             {/* ── Picture ──────────────────────────────────────────────────
                 A fixed square so every card in a row lines up whatever the
                 source image's aspect ratio is. object-contain, not cover: a
                 packshot cropped to fill loses the edges of the product. */}
-            <Link href={href} className='relative block aspect-square overflow-hidden bg-white p-5'>
-                <Image
-                    src={imageSrc}
-                    alt={product.name}
-                    fill
-                    sizes='(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 260px'
-                    className='object-contain p-4 transition-transform duration-500 group-hover:scale-[1.06]'
-                    onError={() => setImageFailed(true)}
-                />
+            {/* The inner box stops short of the bottom by exactly the shelf's
+                height, so the photograph never runs behind the two controls —
+                padding could not do this, because `fill` positions against the
+                padding box and would ignore it. */}
+            <Link href={href} className='pc-pic'>
+                <span className='pc-pic-inner'>
+                    <Image
+                        src={imageSrc}
+                        alt={product.name}
+                        fill
+                        sizes='(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 260px'
+                        className='object-contain transition-transform duration-500 group-hover:scale-[1.06]'
+                        onError={() => setImageFailed(true)}
+                    />
+                </span>
             </Link>
 
             {/* Discount, top left */}
@@ -220,10 +226,11 @@ const NewProductCard: React.FC<NewProductCardProps> = ({ product }) => {
             )}
 
             {/* ── Details ────────────────────────────────────────────────── */}
-            <div className='pc-body relative mt-auto flex flex-1 flex-col gap-2.5 rounded-[18px] px-4 pb-4 pt-7'>
+            <div className='pc-body relative mt-auto flex flex-1 flex-col gap-1.5 px-4 pb-4 pt-4'>
 
-                {/* The two round controls overlap the top edge of this panel. */}
-                <div className='absolute -top-5 right-4 z-20 flex items-center gap-2'>
+                {/* The panel's top edge rises over the two controls instead of
+                    running straight past them — see .pc-notch in globals.css. */}
+                <div className='pc-notch'>
                     <button
                         onClick={handleWishlistToggle}
                         aria-label={isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
@@ -236,12 +243,11 @@ const NewProductCard: React.FC<NewProductCardProps> = ({ product }) => {
                     </Link>
                 </div>
 
+                {/* One line, always. A name that wrapped to two pushed the price
+                    and the button row down on that card alone, so a row of cards
+                    no longer shared a baseline. */}
                 <h3 className='pc-name'>
                     <Link href={href} className='hover:text-[var(--color-primary)] transition-colors'>{product.name}</Link>
-                    {' '}
-                    <span className={inStock ? 'pc-stock-in' : 'pc-stock-out'}>
-                        {inStock ? 'In Stock' : 'Out of Stock'}
-                    </span>
                 </h3>
 
                 <div className='flex items-baseline gap-2'>
@@ -249,20 +255,10 @@ const NewProductCard: React.FC<NewProductCardProps> = ({ product }) => {
                     {oldPrice && oldPrice > currentPrice && (
                         <span className='pc-price-old'>৳ {oldPrice.toLocaleString('en-US')}</span>
                     )}
+                    {soldCount > 0 && (
+                        <span className='pc-sold'>{formatCount(soldCount)} sold</span>
+                    )}
                 </div>
-
-                {((product.rating || 0) > 0 || soldCount > 0) && (
-                    <div className='flex items-center gap-1.5 text-[11px] text-slate-400'>
-                        {(product.rating || 0) > 0 && (
-                            <span className='flex items-center gap-1'>
-                                <FiStar size={11} style={{ color: '#f59e0b', fill: '#f59e0b' }} />
-                                <span className='font-semibold text-slate-600'>{Number(product.rating).toFixed(1)}</span>
-                            </span>
-                        )}
-                        {(product.rating || 0) > 0 && soldCount > 0 && <span className='text-slate-300'>·</span>}
-                        {soldCount > 0 && <span>{formatCount(soldCount)} sold</span>}
-                    </div>
-                )}
 
                 <div className='mt-1 flex items-center gap-2'>
                     <button onClick={handleAddToCart} className='pc-cart' disabled={!inStock}>

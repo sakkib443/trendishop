@@ -2,41 +2,71 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { FiArrowRight, FiShoppingBag } from 'react-icons/fi';
+import { FiArrowRight, FiShoppingBag, FiPhone } from 'react-icons/fi';
+import { FaWhatsapp } from 'react-icons/fa';
+import { useGetSiteContentQuery } from '@/redux/api/siteContentApi';
+import { telHref, whatsappHref } from '@/utils/contactLinks';
 
-// The home page's closing call to action: one way forward, into the catalogue.
-// (It used to invite people to "Become a Seller" — this is a single store.)
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+/**
+ * The home page's closing call to action.
+ *
+ * A rounded charcoal band carrying the same gradient as the header, so the
+ * page is bookended by the brand's dark tone rather than the stock indigo it
+ * shipped with. Two ways forward: the catalogue, or a human on the phone.
+ */
+
+const FALLBACK_PHONE = '01711946614';
+
 const CtaBanner: React.FC = () => {
+    const { data: siteRes } = useGetSiteContentQuery({});
+    const contact: any = siteRes?.data?.contact || {};
+
+    const phone = String(contact.phones?.[0] || contact.phone || FALLBACK_PHONE).trim();
+    const tel = telHref(phone);
+    const wa = whatsappHref(contact.whatsapp || siteRes?.data?.floating?.whatsapp || FALLBACK_PHONE);
+
     return (
-        <section className="w-full relative overflow-hidden">
-            {/* Background — indigo gradient */}
-            <div
-                className="absolute inset-0"
-                style={{ background: 'linear-gradient(120deg, var(--color-primary) 0%, var(--color-primary-dark) 55%, var(--color-primary) 100%)' }}
-            />
-            {/* Decorative blobs */}
-            <div className="absolute -top-24 -right-16 w-80 h-80 rounded-full bg-white/[0.06]" />
-            <div className="absolute -bottom-24 -left-16 w-72 h-72 rounded-full bg-white/[0.05]" />
+        <section className="w-full">
+            <div className="container mx-auto py-8 sm:py-12">
+                <div className="cta-band px-6 py-9 sm:px-10 sm:py-12">
+                    <div className="relative flex flex-col gap-7 lg:flex-row lg:items-center lg:justify-between lg:gap-10">
 
-            {/* Content */}
-            <div className="relative container mx-auto px-4 py-16 text-center">
-                <span className="inline-flex items-center gap-2 mb-4 px-3 py-1 rounded-full bg-white/10 text-[11px] font-semibold tracking-[0.18em] uppercase text-white/80">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#22C55E]" /> Shop Trendy Shops
-                </span>
+                        {/* Copy */}
+                        <div className="max-w-xl">
+                            <span className="cta-eyebrow"><i />Shop Trendy Shops</span>
+                            <h2 className="cta-h mt-3">
+                                Every gadget you want,<br className="hidden sm:block" /> at a price that makes sense.
+                            </h2>
+                            <p className="cta-p">
+                                Phones, laptops, audio, wearables, monitors and power backup — genuine
+                                stock with official warranty, delivered anywhere in Bangladesh.
+                            </p>
+                        </div>
 
-                <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-3 tracking-tight">
-                    Everything your home needs
-                </h2>
-                <p className="text-sm md:text-base text-white/75 mb-8 max-w-xl mx-auto leading-relaxed">
-                    Lighting, fans, wiring and power backup at honest prices — delivered to your door anywhere in Bangladesh.
-                </p>
+                        {/* Actions */}
+                        <div className="flex flex-col gap-3 sm:flex-row lg:flex-col lg:items-stretch xl:flex-row">
+                            <Link href="/products" className="cta-primary">
+                                <FiShoppingBag size={16} />
+                                Shop all products
+                                <FiArrowRight size={16} />
+                            </Link>
 
-                <Link
-                    href="/products"
-                    className="inline-flex items-center justify-center gap-2 bg-white text-[var(--color-primary)] font-bold text-sm px-8 py-3.5 rounded-md hover:bg-slate-100 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 w-full sm:w-auto"
-                >
-                    <FiShoppingBag size={16} /> Shop all products <FiArrowRight size={16} />
-                </Link>
+                            {wa ? (
+                                <a href={wa} target="_blank" rel="noopener noreferrer" className="cta-ghost">
+                                    <FaWhatsapp size={17} />
+                                    {phone}
+                                </a>
+                            ) : tel ? (
+                                <a href={tel} className="cta-ghost">
+                                    <FiPhone size={16} />
+                                    {phone}
+                                </a>
+                            ) : null}
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
     );

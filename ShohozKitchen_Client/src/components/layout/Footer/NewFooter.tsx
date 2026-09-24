@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { useAppSelector, useAppDispatch } from '@/redux';
 import { logout } from '@/redux/slices/authSlice';
 import Logo from '@/components/shared/Logo';
-import { FiMapPin, FiMail, FiPhone, FiGlobe } from 'react-icons/fi';
+import { FiMapPin, FiMail, FiPhone, FiGlobe, FiArrowRight } from 'react-icons/fi';
 import { FaFacebookF, FaLinkedinIn, FaYoutube, FaInstagram, FaWhatsapp } from 'react-icons/fa';
 import { FaXTwitter, FaTiktok } from 'react-icons/fa6';
 import { toast } from 'react-hot-toast';
@@ -15,6 +15,23 @@ import { useGetSiteContentQuery } from '@/redux/api/siteContentApi';
 import { telHref, whatsappHref } from '@/utils/contactLinks';
 import { homeFor, isStaffRole } from '@/components/admin/access';
 import type { IconType } from 'react-icons';
+
+/**
+ * The site footer.
+ *
+ * Charcoal, on the same gradient and the same 18px corner radius as the
+ * header — so the page opens and closes on the brand's dark tone with the
+ * light catalogue between.
+ *
+ * Organised in four bands, widest concern first: newsletter, then five
+ * columns (brand · shop · help · policies · contact), then the payment strip,
+ * then the copyright line. The link columns are declared as data below rather
+ * than written out as markup, which is what keeps them the same width, the
+ * same spacing and the same order every time one is edited.
+ *
+ * Everything contactable is still driven by Admin → Site Content; an empty
+ * field is simply not rendered.
+ */
 
 /* ─── Map a social label to its icon (case-insensitive) ─── */
 const SOCIAL_ICONS: { match: string; icon: IconType }[] = [
@@ -33,6 +50,50 @@ const getSocialIcon = (label: string): IconType => {
 };
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+
+/* The three link columns. Every href here is a page that exists. */
+const LINK_COLUMNS: { heading: string; links: { label: string; href: string }[] }[] = [
+    {
+        heading: 'Shop',
+        links: [
+            { label: 'All Products', href: '/products' },
+            { label: 'Phones', href: '/products?category=phones' },
+            { label: 'Laptops', href: '/products?category=laptops' },
+            { label: 'Audio', href: '/products?category=audio' },
+            { label: 'Wishlist', href: '/wishlist' },
+        ],
+    },
+    {
+        heading: 'Help',
+        links: [
+            { label: 'Track Order', href: '/track' },
+            { label: 'Contact Us', href: '/contact' },
+            { label: 'Our Services', href: '/services' },
+            { label: 'Payment Methods', href: '/payment' },
+        ],
+    },
+    {
+        heading: 'Policies',
+        links: [
+            { label: 'Terms & Conditions', href: '/terms' },
+            { label: 'Privacy Policy', href: '/privacy' },
+            { label: 'Refund Policy', href: '/refund' },
+        ],
+    },
+];
+
+/* The wallets and cards the shop takes. Drawn as text chips rather than
+   loaded as logos — six tiny images is six more requests for no gain.
+   These are each brand's hue lifted toward white, because the real colours
+   (#1A1F71 Visa, #00529B DBBL) all but vanish against the charcoal glass. */
+const PAYMENTS: { label: string; color: string; size?: string }[] = [
+    { label: 'VISA', color: '#A9B6FF', size: 'text-[11px]' },
+    { label: 'Mastercard', color: '#EB001B' },
+    { label: 'bKash', color: '#FF6F96' },
+    { label: 'Nagad', color: '#FFB35C' },
+    { label: 'Rocket', color: '#D090D0' },
+    { label: 'DBBL', color: '#6FB5EE' },
+];
 
 const NewFooter: React.FC = () => {
     const { isAuthenticated, user } = useAppSelector((state) => state.auth);
@@ -95,179 +156,200 @@ const NewFooter: React.FC = () => {
         router.push('/');
     };
 
-    return (
-        <footer className="bg-white border-t border-gray-200">
-            {/* ── Main Footer (single section) ── */}
-            <div className="container mx-auto px-4 py-10">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+    const year = new Date().getFullYear();
+    const companyName = siteRes?.data?.footer?.companyName || 'Trendy Shops';
+    const copyright = siteRes?.data?.footer?.copyright || '© ' + year + ' ' + companyName + '. All rights reserved.';
 
-                    {/* Brand + Address + Social */}
-                    <div className="sm:col-span-2 lg:col-span-1">
-                        <Link href="/" className="inline-flex items-center mb-5 group select-none" aria-label="Trendy Shops">
-                            <Logo size={66} />
-                        </Link>
-                        <div className="space-y-2.5">
-                            {corporateOffice && (
-                                <div className="flex items-start gap-2.5">
-                                    <FiMapPin size={14} className="text-gray-400 mt-0.5 shrink-0" />
-                                    <p className="text-sm text-gray-500"><span className="font-semibold text-gray-600">Corporate Office:</span> {corporateOffice}</p>
+    const accountLink = isAuthenticated
+        ? { label: 'My Account', href: isStaffRole(user?.role) ? homeFor(user?.role) : '/dashboard/user' }
+        : { label: 'Sign In / Register', href: '/login' };
+
+    return (
+        <footer className="ft mt-6">
+
+            {/* ── Band 1 · Newsletter ── */}
+            <div className="container mx-auto px-4 py-8 sm:py-9">
+                <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+                    <div>
+                        <h4 className="ft-h">Subscribe to our newsletter</h4>
+                        <p className="ft-meta mt-1.5">
+                            New arrivals, price drops and offers — straight to your inbox.
+                        </p>
+                    </div>
+                    <form onSubmit={handleSubscribe} className="ft-form w-full max-w-md">
+                        <input
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="Enter your email"
+                            aria-label="Email address"
+                            disabled={subscribing}
+                            className="ft-input"
+                        />
+                        <button type="submit" disabled={subscribing} className="ft-sub">
+                            {subscribing ? 'Subscribing…' : 'Subscribe'}
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            {/* ── Band 2 · Brand, links, contact ── */}
+            <div className="ft-rule">
+                <div className="container mx-auto px-4 py-9 sm:py-11">
+                    <div className="grid grid-cols-2 gap-x-6 gap-y-9 sm:grid-cols-3 lg:grid-cols-12 lg:gap-8">
+
+                        {/* Brand + address */}
+                        <div className="col-span-2 sm:col-span-3 lg:col-span-4">
+                            <Link href="/" className="inline-flex select-none items-center" aria-label={companyName}>
+                                <Logo size={58} light />
+                            </Link>
+
+                            <div className="mt-5 space-y-3">
+                                {corporateOffice && (
+                                    <div className="flex items-start gap-2.5">
+                                        <FiMapPin size={14} className="ft-ico mt-[3px]" />
+                                        <p className="ft-meta"><span className="ft-strong">Corporate Office:</span> {corporateOffice}</p>
+                                    </div>
+                                )}
+                                {warehouse && (
+                                    <div className="flex items-start gap-2.5">
+                                        <FiMapPin size={14} className="ft-ico mt-[3px]" />
+                                        <p className="ft-meta"><span className="ft-strong">Warehouse:</span> {warehouse}</p>
+                                    </div>
+                                )}
+                                {website && (
+                                    <div className="flex items-start gap-2.5">
+                                        <FiGlobe size={14} className="ft-ico mt-[3px]" />
+                                        <a href={`https://${website}`} target="_blank" rel="noopener noreferrer" className="ft-a">{website}</a>
+                                    </div>
+                                )}
+                                {emailList.map((em) => (
+                                    <div key={em} className="flex items-center gap-2.5">
+                                        <FiMail size={14} className="ft-ico" />
+                                        <a href={`mailto:${em}`} className="ft-a break-all">{em}</a>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {socials.length > 0 && (
+                                <div className="mt-6 flex items-center gap-2.5">
+                                    {socials.map((s) => {
+                                        const Icon = getSocialIcon(s.label);
+                                        return (
+                                            <a
+                                                key={s.label}
+                                                href={s.url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                aria-label={s.label}
+                                                className="ft-soc"
+                                            >
+                                                <Icon size={14} />
+                                            </a>
+                                        );
+                                    })}
                                 </div>
                             )}
-                            {warehouse && (
-                                <div className="flex items-start gap-2.5">
-                                    <FiMapPin size={14} className="text-gray-400 mt-0.5 shrink-0" />
-                                    <p className="text-sm text-gray-500"><span className="font-semibold text-gray-600">Warehouse:</span> {warehouse}</p>
-                                </div>
-                            )}
-                            {website && (
-                                <div className="flex items-start gap-2.5">
-                                    <FiGlobe size={14} className="text-gray-400 mt-0.5 shrink-0" />
-                                    <a href={`https://${website}`} target="_blank" rel="noopener noreferrer" className="text-sm text-gray-500 hover:text-[var(--color-primary)] transition-colors">{website}</a>
-                                </div>
-                            )}
-                            {emailList.map((em) => (
-                                <div key={em} className="flex items-center gap-2.5">
-                                    <FiMail size={14} className="text-gray-400 shrink-0" />
-                                    <a href={`mailto:${em}`} className="text-sm text-gray-500 hover:text-[var(--color-primary)] transition-colors break-all">{em}</a>
-                                </div>
-                            ))}
                         </div>
-                        {/* Social Icons — dynamic from admin / site-content */}
-                        {socials.length > 0 && (
-                            <div className="flex items-center gap-3 mt-4">
-                                {socials.map((s) => {
-                                    const Icon = getSocialIcon(s.label);
+
+                        {/* Three link columns, identical by construction */}
+                        {LINK_COLUMNS.map((col) => (
+                            <nav key={col.heading} className="lg:col-span-2" aria-label={col.heading}>
+                                <h4 className="ft-h mb-4">{col.heading}</h4>
+                                <ul className="space-y-2.5">
+                                    {col.links.map((l) => (
+                                        <li key={l.href}>
+                                            <Link href={l.href} className="ft-a">{l.label}</Link>
+                                        </li>
+                                    ))}
+                                    {/* The account link belongs under Help, but only it changes
+                                        with auth state — so it is appended rather than declared. */}
+                                    {col.heading === 'Help' && (
+                                        <li><Link href={accountLink.href} className="ft-a">{accountLink.label}</Link></li>
+                                    )}
+                                </ul>
+                            </nav>
+                        ))}
+
+                        {/* Contact */}
+                        <div className="col-span-2 sm:col-span-3 lg:col-span-2">
+                            <h4 className="ft-h mb-4">Talk to us</h4>
+                            <div className="space-y-2.5">
+                                {phoneList.map((p, i) => {
+                                    const href = telHref(p);
+                                    if (!href) return null;
+                                    const isPrimary = i === 0;
                                     return (
                                         <a
-                                            key={s.label}
-                                            href={s.url}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            aria-label={s.label}
-                                            className="w-8 h-8 bg-gray-900 rounded-full flex items-center justify-center text-white hover:bg-[var(--color-primary)] transition-colors"
+                                            key={p}
+                                            href={href}
+                                            className={isPrimary
+                                                ? 'flex items-center gap-2.5 text-[17px] font-bold text-white hover:opacity-90'
+                                                : 'ft-a flex items-center gap-2.5'}
                                         >
-                                            <Icon size={14} />
+                                            <FiPhone
+                                                size={isPrimary ? 16 : 14}
+                                                className={isPrimary ? 'text-[var(--color-primary)]' : 'ft-ico'}
+                                            />
+                                            {p}
                                         </a>
                                     );
                                 })}
+                                {whatsappLink && (
+                                    <a href={whatsappLink} target="_blank" rel="noopener noreferrer" className="ft-a flex items-center gap-2.5">
+                                        <FaWhatsapp size={14} className="ft-ico" />
+                                        WhatsApp
+                                        <FiArrowRight size={12} />
+                                    </a>
+                                )}
+                                <p className="ft-meta">10am – 10pm, seven days a week.</p>
                             </div>
-                        )}
+                        </div>
                     </div>
+                </div>
+            </div>
 
-                    {/* Menu 1 - Quick Links */}
-                    <div>
-                        <h4 className="text-sm font-bold text-gray-900 mb-4 uppercase tracking-wide">Quick Links</h4>
-                        <ul className="space-y-2.5">
-                            <li><Link href="/" className="text-sm text-gray-500 hover:text-[var(--color-primary)] transition-colors">Home</Link></li>
-                            <li><Link href="/products" className="text-sm text-gray-500 hover:text-[var(--color-primary)] transition-colors">All Products</Link></li>
-                            <li><Link href="/track" className="text-sm text-gray-500 hover:text-[var(--color-primary)] transition-colors">Track Order</Link></li>
-                            <li><Link href="/services" className="text-sm text-gray-500 hover:text-[var(--color-primary)] transition-colors">Our Services</Link></li>
-                            <li><Link href="/contact" className="text-sm text-gray-500 hover:text-[var(--color-primary)] transition-colors">Contact Us</Link></li>
-                        </ul>
-                    </div>
-
-                    {/* Menu 2 - Support */}
-                    <div>
-                        <h4 className="text-sm font-bold text-gray-900 mb-4 uppercase tracking-wide">Support</h4>
-                        <ul className="space-y-2.5">
-                            {phoneList.map((p, i) => {
-                                const href = telHref(p);
-                                if (!href) return null;
-                                return (
-                                    <li key={p}>
-                                        <a href={href} className={`flex items-center gap-2 text-sm ${i === 0 ? 'font-semibold text-[var(--color-primary)] hover:underline' : 'text-gray-500 hover:text-[var(--color-primary)] transition-colors'}`}>
-                                            <FiPhone size={14} /> {p}
-                                        </a>
-                                    </li>
-                                );
-                            })}
-                            {whatsappLink && (
-                                <li><a href={whatsappLink} target="_blank" rel="noopener noreferrer" className="text-sm text-gray-500 hover:text-[var(--color-primary)] transition-colors">Live Chat (WhatsApp)</a></li>
-                            )}
-                            {isAuthenticated ? (
-                                <li><Link href={isStaffRole(user?.role) ? homeFor(user?.role) : '/dashboard/user'}className="text-sm text-gray-500 hover:text-[var(--color-primary)] transition-colors">My Account</Link></li>
-                            ) : (
-                                <li><Link href="/login" className="text-sm text-gray-500 hover:text-[var(--color-primary)] transition-colors">Sign In / Register</Link></li>
-                            )}
-                        </ul>
-                    </div>
-
-                    {/* Payment Methods */}
-                    <div>
-                        <h4 className="text-sm font-bold text-gray-900 mb-4 uppercase tracking-wide">We Accept</h4>
-                        <div className="grid grid-cols-4 gap-2">
-                            <div className="bg-white border border-gray-200 rounded-md px-2 py-2 flex items-center justify-center h-9">
-                                <span className="text-xs font-bold tracking-tight" style={{ color: '#1A1F71' }}>VISA</span>
-                            </div>
-                            <div className="bg-white border border-gray-200 rounded-md px-2 py-2 flex items-center justify-center h-9">
-                                <div className="flex items-center gap-0.5">
-                                    <div className="w-3.5 h-3.5 rounded-full bg-[#EB001B] opacity-80" />
-                                    <div className="w-3.5 h-3.5 rounded-full bg-[#F79E1B] opacity-80 -ml-2" />
+            {/* ── Band 3 · Payment strip ── */}
+            <div className="ft-rule">
+                <div className="container mx-auto px-4 py-5">
+                    <div className="flex flex-col items-center gap-3.5 sm:flex-row sm:justify-between">
+                        <h4 className="ft-h">We Accept</h4>
+                        <div className="flex flex-wrap items-center justify-center gap-2">
+                            {PAYMENTS.map((p) => (
+                                <div key={p.label} className="ft-pay w-[62px]" title={p.label}>
+                                    {p.label === 'Mastercard' ? (
+                                        <span className="flex items-center">
+                                            <span className="h-3.5 w-3.5 rounded-full bg-[#EB001B] opacity-85" />
+                                            <span className="-ml-2 h-3.5 w-3.5 rounded-full bg-[#F79E1B] opacity-85" />
+                                        </span>
+                                    ) : (
+                                        <span
+                                            className={'font-bold tracking-tight ' + (p.size || 'text-[10px]')}
+                                            style={{ color: p.color }}
+                                        >
+                                            {p.label}
+                                        </span>
+                                    )}
                                 </div>
-                            </div>
-                            <div className="bg-white border border-gray-200 rounded-md px-2 py-2 flex items-center justify-center h-9">
-                                <span className="text-[10px] font-bold" style={{ color: '#D12053' }}>bKash</span>
-                            </div>
-                            <div className="bg-white border border-gray-200 rounded-md px-2 py-2 flex items-center justify-center h-9">
-                                <span className="text-[10px] font-bold" style={{ color: '#F6921E' }}>Nagad</span>
-                            </div>
-                            <div className="bg-white border border-gray-200 rounded-md px-2 py-2 flex items-center justify-center h-9">
-                                <span className="text-[10px] font-bold" style={{ color: '#8B2F8B' }}>Rocket</span>
-                            </div>
-                            <div className="bg-white border border-gray-200 rounded-md px-2 py-2 flex items-center justify-center h-9">
-                                <span className="text-[9px] font-bold" style={{ color: '#00529B' }}>DBBL</span>
-                            </div>
+                            ))}
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* ── Newsletter ── */}
-            <div className="border-t border-gray-200">
-                <div className="container mx-auto px-4 py-7">
-                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-5">
-                        <div>
-                            <h4 className="text-sm font-bold text-gray-900 uppercase tracking-wide">Subscribe to our newsletter</h4>
-                            <p className="mt-1 text-sm text-gray-500">Get the latest deals, offers and product updates straight to your inbox.</p>
-                        </div>
-                        <form onSubmit={handleSubscribe} className="flex w-full max-w-md items-stretch gap-2">
-                            <input
-                                type="email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                placeholder="Enter your email"
-                                aria-label="Email address"
-                                disabled={subscribing}
-                                className="flex-1 min-w-0 rounded-md border border-gray-300 px-3.5 py-2.5 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] disabled:opacity-60"
-                            />
-                            <button
-                                type="submit"
-                                disabled={subscribing}
-                                className="shrink-0 rounded-md px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
-                                style={{ background: 'var(--color-primary)' }}
-                            >
-                                {subscribing ? 'Subscribing…' : 'Subscribe'}
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-
-            {/* ── Bottom Footer ── */}
-            <div className="border-t border-gray-200">
+            {/* ── Band 4 · Copyright ── */}
+            <div className="ft-rule">
                 <div className="container mx-auto px-4 py-4">
-                    <div className="flex flex-col md:flex-row items-center justify-between gap-2">
-                        <p className="text-xs text-gray-400">
-                            {siteRes?.data?.footer?.copyright || `© 2019-${new Date().getFullYear()} ${siteRes?.data?.footer?.companyName || 'Trendy Shops'}. All Rights Reserved.`}
-                        </p>
+                    <div className="flex flex-col items-center justify-between gap-2.5 md:flex-row">
+                        <p className="text-xs text-white/40">{copyright}</p>
                         <div className="flex items-center gap-3">
-                            <span className="text-xs text-gray-400">
+                            <span className="text-xs text-white/40">
                                 Developed by{' '}
                                 <a
                                     href="https://www.extrainweb.com/"
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="font-semibold text-gray-500 hover:text-[var(--color-primary)] transition-colors"
+                                    className="font-semibold text-white/65 transition-colors hover:text-[var(--color-primary)]"
                                 >
                                     Extrain Web
                                 </a>
@@ -277,18 +359,18 @@ const NewFooter: React.FC = () => {
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 aria-label="Extrain Web on Facebook"
-                                className="text-gray-400 hover:text-[var(--color-primary)] transition-colors"
+                                className="text-white/40 transition-colors hover:text-[var(--color-primary)]"
                             >
-                                <FaFacebookF size={14} />
+                                <FaFacebookF size={13} />
                             </a>
                             <a
                                 href="https://www.extrainweb.com/"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 aria-label="Extrain Web website"
-                                className="text-gray-400 hover:text-[var(--color-primary)] transition-colors"
+                                className="text-white/40 transition-colors hover:text-[var(--color-primary)]"
                             >
-                                <FiGlobe size={14} />
+                                <FiGlobe size={13} />
                             </a>
                         </div>
                     </div>

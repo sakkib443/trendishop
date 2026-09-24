@@ -12,6 +12,7 @@ import { FiX, FiSearch } from 'react-icons/fi';
 import QualityFeatures from './QualityFeatures';
 import CtaBanner from './CtaBanner';
 import FlashSale from './FlashSale';
+import PromoPair, { ONLINE_EXCLUSIVE } from './PromoPair';
 import DealsRow from './DealsRow';
 import BestSellers from './BestSellers';
 
@@ -124,7 +125,7 @@ const NewHomePage: React.FC = () => {
         return (
             <div>
                 <div className="w-full mx-auto px-2 sm:px-4 py-4 sm:py-6">
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3">
                         {[...Array(10)].map((_, i) => (
                             <div key={i} className="bg-white border border-gray-200 rounded-md overflow-hidden animate-pulse">
                                 <div className="aspect-square bg-gray-200" />
@@ -145,8 +146,18 @@ const NewHomePage: React.FC = () => {
             {!searchTerm && !selectedCategory && (
                 <>
                     <FlashSale />
+
+                    <PromoPair />
                     <DealsRow />
                     <BestSellers />
+
+                    {/* Online Exclusive — the pair that leads into Popular Products. */}
+                    <PromoPair
+                        banners={ONLINE_EXCLUSIVE}
+                        aspect="640 / 237"
+                        contentKey="promoPairSecondary"
+                        className="pt-2 pb-4 sm:pt-3 sm:pb-6"
+                    />
                 </>
             )}
 
@@ -200,18 +211,18 @@ const NewHomePage: React.FC = () => {
                 {/* Popular Products (Strictly isFeatured: true) */}
                 {!searchTerm && !selectedCategory && featuredProducts.length > 0 && (
                     <div className="mb-6 sm:mb-10">
-                        <div className="text-center mb-5 sm:mb-8 mt-4 sm:mt-6">
-                            <div className="flex items-center justify-center gap-2 mb-1.5 sm:mb-2">
-                                <span className="h-px w-6 sm:w-8 bg-[var(--color-primary)]/30" />
-                                <span className="text-[10px] sm:text-[11px] font-semibold tracking-[0.2em] sm:tracking-[0.25em] text-[var(--color-primary)] uppercase">What&apos;s Hot Right Now</span>
-                                <span className="h-px w-6 sm:w-8 bg-[var(--color-primary)]/30" />
+                        <div className="flex items-center justify-between mb-4 mt-4 sm:mt-6">
+                            <div className="flex items-center gap-2.5">
+                                <span className="w-[3px] h-5 rounded-full" style={{ background: 'var(--color-primary)' }} />
+                                <h3 className="text-sm sm:text-base font-semibold text-gray-800 tracking-tight">Popular Products</h3>
                             </div>
-                            <h3 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-gray-900 tracking-tight">Popular Products</h3>
-                            <p className="mt-1.5 sm:mt-2 text-xs sm:text-sm text-gray-500 max-w-md mx-auto hidden sm:block">Trending items loved by our customers worldwide.</p>
+                            <Link href="/products" className="text-xs font-semibold hover:underline" style={{ color: 'var(--color-primary)' }}>
+                                View All →
+                            </Link>
                         </div>
 
-                        <div className={`grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-4 transition-opacity duration-200 ${isFetchingFeatured ? 'opacity-60' : 'opacity-100'}`}>
-                            {featuredProducts.slice(0, 12).map((product: any) => (
+                        <div className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-4 transition-opacity duration-200 ${isFetchingFeatured ? 'opacity-60' : 'opacity-100'}`}>
+                            {featuredProducts.slice(0, 10).map((product: any) => (
                                 <NewProductCard
                                     key={`feat-${product._id}`}
                                     product={{
@@ -240,15 +251,6 @@ const NewHomePage: React.FC = () => {
                                 />
                             ))}
                         </div>
-
-                        <div className="mt-6 flex justify-center">
-                            <Link
-                                href="/products?isFeatured=true"
-                                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-[var(--color-primary)]/20 bg-[var(--color-primary)]/5 text-sm font-semibold text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-white hover:border-[var(--color-primary)] transition-all duration-300"
-                            >
-                                View All Featured <span aria-hidden>→</span>
-                            </Link>
-                        </div>
                     </div>
                 )}
             </div>
@@ -257,18 +259,18 @@ const NewHomePage: React.FC = () => {
                 {/* New Arrivals (Strictly isNewProduct: true) */}
                 {!searchTerm && !selectedCategory && (
                     <div className="mb-6 sm:mb-10">
-                        <div className="text-center mb-5 sm:mb-8 mt-4 sm:mt-6">
-                            <div className="flex items-center justify-center gap-2 mb-1.5 sm:mb-2">
-                                <span className="h-px w-6 sm:w-8 bg-[var(--color-primary)]/30" />
-                                <span className="text-[10px] sm:text-[11px] font-semibold tracking-[0.2em] sm:tracking-[0.25em] text-[var(--color-primary)] uppercase">Just Landed</span>
-                                <span className="h-px w-6 sm:w-8 bg-[var(--color-primary)]/30" />
+                        <div className="flex items-center justify-between mb-4 mt-4 sm:mt-6">
+                            <div className="flex items-center gap-2.5">
+                                <span className="w-[3px] h-5 rounded-full" style={{ background: 'var(--color-primary)' }} />
+                                <h3 className="text-sm sm:text-base font-semibold text-gray-800 tracking-tight">New Arrivals</h3>
                             </div>
-                            <h3 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-gray-900 tracking-tight">New Arrivals</h3>
-                            <p className="mt-1.5 sm:mt-2 text-xs sm:text-sm text-gray-500 max-w-md mx-auto hidden sm:block">Freshly added products you don&apos;t want to miss.</p>
+                            <Link href="/products" className="text-xs font-semibold hover:underline" style={{ color: 'var(--color-primary)' }}>
+                                View All →
+                            </Link>
                         </div>
 
-                        <div className={`grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-4 transition-opacity duration-200 ${isFetchingNew ? 'opacity-60' : 'opacity-100'}`}>
-                            {newArrivalProducts.slice(0, 12).map((product: any) => (
+                        <div className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-4 transition-opacity duration-200 ${isFetchingNew ? 'opacity-60' : 'opacity-100'}`}>
+                            {newArrivalProducts.slice(0, 10).map((product: any) => (
                                 <NewProductCard
                                     key={`new-${product._id}`}
                                     product={{
@@ -296,15 +298,6 @@ const NewHomePage: React.FC = () => {
                                     }}
                                 />
                             ))}
-                        </div>
-
-                        <div className="mt-6 flex justify-center">
-                            <Link
-                                href="/products?isNewProduct=true"
-                                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-[var(--color-primary)]/20 bg-[var(--color-primary)]/5 text-sm font-semibold text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-white hover:border-[var(--color-primary)] transition-all duration-300"
-                            >
-                                View All New Arrivals <span aria-hidden>→</span>
-                            </Link>
                         </div>
                     </div>
                 )}
@@ -356,7 +349,7 @@ const NewHomePage: React.FC = () => {
 
                 {/* Loading more skeleton */}
                 {isLoadingMore && (
-                    <div className="mt-4 sm:mt-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-4">
+                    <div className="mt-4 sm:mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-4">
                         {[...Array(5)].map((_, i) => (
                             <div key={`skeleton-${i}`} className="bg-white border border-gray-200 rounded-md overflow-hidden animate-pulse">
                                 <div className="aspect-square bg-gray-200" />

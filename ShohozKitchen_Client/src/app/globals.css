@@ -1002,6 +1002,18 @@ h6 {
    utility soup so the card can be restyled in one place.
    ═══════════════════════════════════════════════════════════════════ */
 
+:root {
+  /* The card's lower panel. One value, used by the panel itself, by the shelf
+     that rises over the controls, and by the concave fillet joining the two —
+     they have to match exactly or the seam between them shows. */
+  --pc-panel: #eff1f3;
+
+  /* How far the shelf rises over the picture. The picture well stops exactly
+     this far short of its own bottom, so the two move together from one value
+     and the photograph never ends up behind the controls. */
+  --pc-notch-h: 46px;
+}
+
 .pc {
   border-radius: 24px;
   box-shadow: 0 1px 2px rgba(15, 23, 42, .05), 0 0 0 1px rgba(15, 23, 42, .06);
@@ -1014,7 +1026,7 @@ h6 {
 /* The detail panel. A hair darker than the page so the picture above it
    reads as lit, which is what gives the card its depth. */
 .pc-body {
-  background: #f5f5f5;
+  background: var(--pc-panel);
   /* Top-right stays square: the two round controls sit in that corner, and a
      radius there would leave a sliver of card showing behind them. */
   border-radius: 16px 0 16px 16px;
@@ -1099,24 +1111,27 @@ h6 {
   font-size: 13.5px;
   line-height: 1.45;
   color: #334155;
-  /* Two lines, always — so every card in a row keeps the same height and
-     the price sits on one baseline across the grid. */
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+  /* One line, cut with an ellipsis. Wrapping to a second line moved the price
+     and button row down on that card alone, which broke the row's baseline. */
+  white-space: nowrap;
   overflow: hidden;
-  min-height: 2.9em;
+  text-overflow: ellipsis;
 }
 
-.pc-stock-in { color: #16a34a; font-weight: 600; white-space: nowrap; }
-.pc-stock-out { color: #94a3b8; font-weight: 600; white-space: nowrap; }
+/* Units sold, riding at the right-hand end of the price line. */
+.pc-sold {
+  margin-left: auto;
+  font-size: 11px;
+  color: #94a3b8;
+  white-space: nowrap;
+}
 
 .pc-price {
   /* A six-figure price must not break between the symbol and the digits —
      without this, ৳ 189,900 wrapped onto two lines and pushed that one card's
      button row below the rest of the row. */
   white-space: nowrap;
-  font-size: 19px;
+  font-size: 17px;
   font-weight: 800;
   letter-spacing: -0.4px;
   color: #0f172a;
@@ -1144,7 +1159,9 @@ h6 {
   padding: 0 14px;
   border-radius: 13px;
   background: #ffffff;
-  color: var(--color-primary-dark);
+  /* Pure red, as asked. The basket mark inherits it through currentColor,
+     so the label and the icon stay one colour. */
+  color: #ff0000;
   font-size: 15px;
   font-weight: 600;
   white-space: nowrap;
@@ -1243,7 +1260,7 @@ h6 {
 
 .fs-title {
   font-size: 30px;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: -0.8px;
   color: #111827;
   line-height: 1.1;
@@ -1316,3 +1333,350 @@ h6 {
   color: #111827;
   box-shadow: 0 1px 2px rgba(15, 23, 42, .08), inset 0 0 0 1px rgba(15, 23, 42, .08);
 }
+
+/* ── The notch ────────────────────────────────────────────────────────
+   The detail panel's top edge does not run straight past the wishlist and
+   compare controls — it climbs over them, so the two sit in a shelf of the
+   panel's own colour rather than floating on the seam.
+
+   Three pieces: the shelf itself (a pill rising above the panel, flush to
+   the card's right edge), and a concave fillet to its left where the edge
+   sweeps back down to the panel. The fillet is a radial-gradient rather
+   than a border-radius, because a border can only bulge outward — carving
+   an inward curve needs the paint itself to stop on a circle. */
+
+.pc-notch {
+  position: absolute;
+  right: 0;
+  bottom: 100%;
+  z-index: 20;
+  display: flex;
+  /* The controls sit low in the shelf rather than centred in it, which leaves
+     more grey above them — that headroom is what lets the curve read as a
+     sweep over their heads instead of a bump hugging them. */
+  align-items: flex-end;
+  gap: 8px;
+  /* Taller than the controls it holds. Shared with the picture well's bottom
+     inset, so the photograph always stops exactly where this begins. */
+  height: var(--pc-notch-h);
+  padding: 0 12px 0 16px;
+  background: var(--pc-panel);
+  border-top-left-radius: 28px;
+  border-top-right-radius: 24px;
+}
+
+.pc-notch::before {
+  content: '';
+  position: absolute;
+  right: 100%;
+  bottom: 0;
+  width: 26px;
+  height: 26px;
+  /* Grey everywhere except a quarter-circle bitten out of the top left —
+     that bite is the wave. */
+  background: radial-gradient(circle 26px at top left, transparent 26px, var(--pc-panel) 26px);
+}
+
+/* The controls sit on the shelf, so they lose the ring they wore when they
+   floated over the picture. */
+.pc-notch .pc-icon {
+  box-shadow: 0 1px 3px rgba(15, 23, 42, .12);
+}
+
+/* ── Picture well ─────────────────────────────────────────────────────
+   The outer box keeps the card's square; the inner one holds the photo
+   and ends where the shelf begins, so the product is never behind the
+   wishlist and compare controls. */
+.pc-pic {
+  position: relative;
+  display: block;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.pc-pic-inner {
+  position: absolute;
+  inset: 0 0 var(--pc-notch-h) 0;
+  display: block;
+}
+
+/* ── Featured category tile ───────────────────────────────────────────
+   A framed square rather than a bare image, so a packshot on a white
+   background still reads as a tile and the row keeps its rhythm. */
+.cat-tile {
+  /* Outlined rather than filled: the packshots carry their own white
+     background, so a tint behind them showed as a white square inside a
+     grey one. White on white disappears; the border does the framing. */
+  border-radius: 20px;
+  background: #ffffff;
+  /* Ring first, then a soft drop. The ring keeps the edge crisp against the
+     page; the shadow is what lifts the tile off it. */
+  box-shadow: inset 0 0 0 1px rgba(15, 23, 42, .10),
+              0 2px 6px -2px rgba(15, 23, 42, .12),
+              0 6px 14px -8px rgba(15, 23, 42, .14);
+  transition: box-shadow .2s, transform .2s;
+}
+
+.group:hover > .cat-tile {
+  box-shadow: inset 0 0 0 1px rgba(var(--color-primary-rgb), .45),
+              0 4px 10px -3px rgba(15, 23, 42, .14),
+              0 14px 26px -12px rgba(15, 23, 42, .28);
+  transform: translateY(-3px);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   CLOSING SECTIONS — trust strip, CTA band, footer
+   ───────────────────────────────────────────────────────────────────────────
+   These three shut the home page, so they borrow the language already set
+   further up: the header's warm charcoal gradient, the flash-sale grey band,
+   and the category tile's inset ring + two-layer shadow. The page opens dark
+   (header) and closes dark (CTA + footer), with the light content between.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── Service bar ─────────────────────────────────────────────────────── */
+/* A frosted panel rather than a row of cards: one sheet of glass over the
+   page's own cream, lit by a brand gradient along its top edge. The dividers
+   are the container's background showing through a 1px grid gap — that draws
+   a clean rule between every neighbour at any column count, which per-item
+   borders cannot do once the row wraps to two columns on a phone. */
+.svc-wrap {
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+  background: rgba(15, 23, 42, .09);
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, .04),
+    0 18px 40px -28px rgba(15, 23, 42, .45);
+}
+/* The lit edge — brand at the centre, fading out to either side. */
+.svc-wrap::before {
+  content: '';
+  position: absolute; inset: 0 0 auto 0; height: 2px; z-index: 2;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(var(--color-primary-rgb), .15) 18%,
+    rgba(var(--color-primary-rgb), .85) 50%,
+    rgba(var(--color-primary-rgb), .15) 82%,
+    transparent 100%
+  );
+}
+.svc-row {
+  display: grid;
+  gap: 1px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+@media (min-width: 900px) {
+  .svc-row { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+.svc-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 22px 18px;
+  background: rgba(255, 255, 255, .93);
+  transition: background .25s ease;
+}
+/* A brand wash that rises from the bottom of the cell on hover. */
+.svc-item::after {
+  content: '';
+  position: absolute; inset: 0; pointer-events: none;
+  opacity: 0; transition: opacity .25s ease;
+  background: linear-gradient(to top, rgba(var(--color-primary-rgb), .07), transparent 62%);
+}
+.svc-item:hover { background: #ffffff; }
+.svc-item:hover::after { opacity: 1; }
+
+.svc-ico {
+  position: relative; z-index: 1;
+  flex: 0 0 auto;
+  width: 46px; height: 46px; border-radius: 15px;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff;
+  background-image: linear-gradient(140deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+  box-shadow:
+    0 6px 16px -6px rgba(var(--color-primary-rgb), .65),
+    inset 0 1px 0 rgba(255, 255, 255, .35);
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+.svc-item:hover .svc-ico {
+  transform: translateY(-2px) scale(1.04);
+  box-shadow:
+    0 12px 24px -8px rgba(var(--color-primary-rgb), .8),
+    inset 0 1px 0 rgba(255, 255, 255, .45);
+}
+.svc-t {
+  position: relative; z-index: 1;
+  font-size: 13.5px; font-weight: 600; color: #0f172a;
+  line-height: 1.25; letter-spacing: -0.1px;
+}
+.svc-d {
+  position: relative; z-index: 1;
+  margin-top: 3px; font-size: 11.5px; color: #6b7280; line-height: 1.4;
+}
+
+/* ── Closing CTA ─────────────────────────────────────────────────────── */
+.cta-band {
+  position: relative; overflow: hidden;
+  border-radius: 20px;
+  background-image: linear-gradient(to bottom, #3b352f 0%, #221f1c 55%, #1b1917 100%);
+}
+/* A soft brand glow in the top-right, echoing the page's own backdrop. */
+.cta-band::before {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(52% 78% at 88% 0%, rgba(var(--color-primary-rgb), .22), transparent 70%),
+    radial-gradient(40% 60% at 4% 100%, rgba(255, 255, 255, .05), transparent 70%);
+}
+.cta-eyebrow {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-size: 10.5px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase;
+  color: rgba(255, 255, 255, .62);
+}
+.cta-eyebrow i { width: 6px; height: 6px; border-radius: 999px; background: #22c55e; }
+.cta-h { font-size: 26px; font-weight: 700; color: #fff; letter-spacing: -0.6px; line-height: 1.2; }
+.cta-p { margin-top: 8px; font-size: 13.5px; color: rgba(255, 255, 255, .66); line-height: 1.6; }
+
+.cta-primary {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  height: 46px; padding: 0 22px; border-radius: 13px;
+  background: var(--color-primary); color: #fff;
+  font-size: 14px; font-weight: 600; white-space: nowrap;
+  box-shadow: 0 8px 20px -8px rgba(var(--color-primary-rgb), .75);
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.cta-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 26px -8px rgba(var(--color-primary-rgb), .85); }
+
+.cta-ghost {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  height: 46px; padding: 0 20px; border-radius: 13px;
+  background: rgba(255, 255, 255, .08); color: #fff;
+  font-size: 14px; font-weight: 600; white-space: nowrap;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .16);
+  transition: background .2s ease;
+}
+.cta-ghost:hover { background: rgba(255, 255, 255, .16); }
+
+/* ── Footer ──────────────────────────────────────────────────────────── */
+/* Same charcoal as the header, lit from the top-left by a brand glow and
+   capped by the same gradient hairline the service bar wears — so the three
+   closing elements read as one system rather than three unrelated blocks. */
+.ft {
+  position: relative;
+  isolation: isolate;
+  background-image: linear-gradient(to bottom, #2a2521 0%, #1f1c19 45%, #191715 100%);
+  border-top-left-radius: 18px; border-top-right-radius: 18px;
+  overflow: hidden;
+}
+.ft::before {
+  content: '';
+  position: absolute; inset: 0 0 auto 0; height: 2px; z-index: 2;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(var(--color-primary-rgb), .12) 20%,
+    rgba(var(--color-primary-rgb), .7) 50%,
+    rgba(var(--color-primary-rgb), .12) 80%,
+    transparent 100%
+  );
+}
+.ft::after {
+  content: '';
+  position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(45% 55% at 8% 0%, rgba(var(--color-primary-rgb), .14), transparent 70%),
+    radial-gradient(40% 50% at 95% 12%, rgba(255, 255, 255, .045), transparent 70%);
+}
+
+/* Column headings carry a small brand dot instead of a heavier weight. */
+.ft-h {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 11px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase;
+  color: rgba(255, 255, 255, .92);
+}
+.ft-h::before {
+  content: ''; flex: 0 0 auto;
+  width: 5px; height: 5px; border-radius: 999px;
+  background: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), .18);
+}
+
+.ft-a {
+  position: relative;
+  font-size: 13.5px; color: rgba(255, 255, 255, .56);
+  transition: color .18s ease, padding-left .18s ease;
+}
+.ft-a::before {
+  content: '';
+  position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+  width: 0; height: 1px; background: var(--color-primary);
+  transition: width .18s ease;
+}
+.ft-a:hover { color: #ffffff; padding-left: 11px; }
+.ft-a:hover::before { width: 7px; }
+
+.ft-meta { font-size: 13px; color: rgba(255, 255, 255, .5); }
+.ft-strong { color: rgba(255, 255, 255, .82); font-weight: 600; }
+.ft-ico { color: rgba(255, 255, 255, .34); flex: 0 0 auto; }
+.ft-rule { position: relative; border-top: 1px solid rgba(255, 255, 255, .08); }
+
+.ft-soc {
+  width: 36px; height: 36px; border-radius: 12px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: rgba(255, 255, 255, .06); color: #ffffff;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .12);
+  transition: background .22s ease, transform .22s ease, box-shadow .22s ease;
+}
+.ft-soc:hover {
+  background-image: linear-gradient(140deg, var(--color-primary), var(--color-primary-dark));
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px -8px rgba(var(--color-primary-rgb), .75);
+}
+
+/* Payment chips: translucent glass with the brand's own colour, not white
+   boxes — white tiles on charcoal read as stickers stuck on the footer. */
+.ft-pay {
+  height: 38px; border-radius: 11px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255, 255, 255, .055);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .11);
+  transition: background .2s ease, box-shadow .2s ease, transform .2s ease;
+}
+.ft-pay:hover {
+  background: rgba(255, 255, 255, .10);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .22);
+  transform: translateY(-2px);
+}
+
+/* The newsletter is one glass pill with the button living inside it. */
+.ft-form {
+  display: flex; align-items: center; gap: 8px;
+  padding: 5px 5px 5px 6px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, .06);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .13);
+  transition: box-shadow .22s ease, background .22s ease;
+}
+.ft-form:focus-within {
+  background: rgba(255, 255, 255, .09);
+  box-shadow:
+    inset 0 0 0 1px rgba(var(--color-primary-rgb), .65),
+    0 0 0 4px rgba(var(--color-primary-rgb), .12);
+}
+.ft-input {
+  flex: 1 1 auto; min-width: 0; height: 40px; padding: 0 10px;
+  border: 0; background: transparent; outline: none;
+  color: #fff; font-size: 13.5px;
+}
+.ft-input::placeholder { color: rgba(255, 255, 255, .36); }
+.ft-sub {
+  flex: 0 0 auto; height: 40px; padding: 0 20px; border-radius: 10px;
+  background-image: linear-gradient(140deg, var(--color-primary), var(--color-primary-dark));
+  color: #fff; font-size: 13.5px; font-weight: 600;
+  box-shadow: 0 6px 16px -6px rgba(var(--color-primary-rgb), .7);
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.ft-sub:hover { transform: translateY(-1px); box-shadow: 0 10px 22px -8px rgba(var(--color-primary-rgb), .85); }
+.ft-sub:disabled { opacity: .6; transform: none; }
