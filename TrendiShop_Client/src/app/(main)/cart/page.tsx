@@ -11,6 +11,7 @@ import { addToCart, removeFromCart, increaseQuantity, decreaseQuantity, clearCar
 import { saveForLater, removeFromSaved, hydrateSaved } from '@/redux/slices/savedForLaterSlice';
 import { FiTrash2, FiChevronLeft, FiAlertTriangle, FiMinus, FiPlus, FiShoppingCart, FiTag, FiX, FiCheck, FiBookmark, FiHeart, FiChevronRight } from 'react-icons/fi';
 import EmptyState from '@/components/shared/EmptyState';
+import CheckoutSteps from '@/components/shared/CheckoutSteps';
 import { toast } from 'react-hot-toast';
 import { useValidateCouponMutation } from '@/redux/api/couponApi';
 import { useGetShippingQuoteQuery, useGetShippingSettingsQuery } from '@/redux/api/shippingApi';
@@ -19,6 +20,13 @@ import { getDisplayPrice } from '@/utils/offerPrice';
 
 const COUPON_STORAGE_KEY = 'trendishop_applied_coupon';
 const SELECTED_STORAGE_KEY = 'trendishop_selected_cart';
+
+/* Home-matching surfaces: warm cream page + a premium, soft-shadowed card. */
+const PAGE_BG =
+    'radial-gradient(60% 50% at 92% -6%, rgba(250,204,21,0.06), transparent 70%),' +
+    'radial-gradient(48% 40% at 0% 16%, rgba(245,158,11,0.035), transparent 72%),' +
+    'linear-gradient(180deg, #FFFFFF 0%, #FFFEF9 55%, #FFFCF2 100%)';
+const CARD = 'bg-white rounded-2xl border border-gray-100 shadow-[0_2px_24px_-10px_rgba(30,25,20,0.14)]';
 
 // Resolve common colour names to a CSS hex so the swatch dot always renders.
 const COLOR_HEX_MAP: Record<string, string> = {
@@ -398,7 +406,7 @@ const CartPage = () => {
 
     /* ═══ SAVED FOR LATER SECTION (shared between empty + filled cart) ═══ */
     const savedSection = savedItems.length > 0 && (
-        <div className="bg-white rounded-lg shadow-sm">
+        <div className={CARD}>
             <div className="px-4 sm:px-5 py-3.5 border-b border-gray-100 flex items-center gap-2">
                 <FiHeart size={16} className="text-[var(--color-primary)]" />
                 <h2 className="text-sm font-semibold text-gray-900">
@@ -464,7 +472,7 @@ const CartPage = () => {
     /* ═══ EMPTY CART STATE ═══ */
     if (items.length === 0) {
         return (
-            <div className="bg-[#F8FAFC] min-h-screen pb-20">
+            <div className="min-h-screen pb-20" style={{ background: PAGE_BG }}>
                 {savedItems.length === 0 ? (
                     <div className="py-20">
                         <EmptyState
@@ -480,7 +488,7 @@ const CartPage = () => {
                             <FiChevronLeft size={16} />
                             Back to Shopping
                         </Link>
-                        <div className="bg-white rounded-lg shadow-sm px-5 py-8 text-center mb-6">
+                        <div className={`${CARD} px-5 py-8 text-center mb-6`}>
                             <FiShoppingCart size={28} className="text-gray-300 mx-auto mb-3" />
                             <p className="text-sm text-gray-500">Your cart is empty — your saved items are below.</p>
                         </div>
@@ -492,7 +500,7 @@ const CartPage = () => {
     }
 
     return (
-        <div className="bg-[#F8FAFC] min-h-screen pb-24 lg:pb-20">
+        <div className="min-h-screen pb-24 lg:pb-20" style={{ background: PAGE_BG }}>
             <div className="container mx-auto px-4 sm:px-8 md:px-12 lg:px-16 pt-6 max-w-6xl">
 
                 {/* ═══ HEADER ═══ */}
@@ -501,13 +509,16 @@ const CartPage = () => {
                     Back to Shopping
                 </Link>
 
-                <div className="flex items-center justify-between mb-5">
-                    <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
-                        Shopping Cart
-                        <span className="ml-2 text-sm font-medium text-gray-500">
-                            ({totalQuantity} {totalQuantity === 1 ? 'item' : 'items'})
-                        </span>
-                    </h1>
+                <div className="flex flex-wrap items-end justify-between gap-4 mb-6">
+                    <div>
+                        <h1 className="text-2xl sm:text-[28px] font-extrabold text-gray-900 tracking-tight">
+                            Shopping Cart
+                        </h1>
+                        <p className="text-sm text-gray-500 mt-0.5">
+                            {totalQuantity} {totalQuantity === 1 ? 'item' : 'items'} ready to check out
+                        </p>
+                    </div>
+                    <CheckoutSteps current={0} />
                     <button
                         onClick={handleClearCart}
                         className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-red-500 transition-colors"
@@ -522,7 +533,7 @@ const CartPage = () => {
 
                     {/* ═══ LEFT: CART ITEMS ═══ */}
                     <div className="lg:col-span-8">
-                        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+                        <div className={`${CARD} overflow-hidden`}>
 
                             {/* Select-all bar (Daraz-style) */}
                             <div className="flex items-center justify-between px-4 sm:px-5 py-3.5 border-b border-gray-100">
@@ -552,7 +563,7 @@ const CartPage = () => {
                                             </span>
                                         </button>
                                         {/* Product image */}
-                                        <div className="w-20 h-20 sm:w-[88px] sm:h-[88px] rounded-md border border-gray-100 bg-white p-1.5 flex-shrink-0">
+                                        <div className="w-20 h-20 sm:w-[88px] sm:h-[88px] rounded-xl border border-gray-100 bg-gradient-to-br from-gray-50 to-white p-2 flex-shrink-0">
                                             <img src={item.image} alt={item.name} className="w-full h-full object-contain" />
                                         </div>
 
@@ -669,10 +680,14 @@ const CartPage = () => {
 
                     {/* ═══ RIGHT: ORDER SUMMARY ═══ */}
                     <div className="lg:col-span-4 lg:sticky lg:top-24 h-fit">
-                        <div className="bg-white rounded-lg shadow-sm">
+                        <div className={CARD}>
 
-                            <div className="px-5 py-3.5 border-b border-gray-100">
-                                <h2 className="text-sm font-semibold text-gray-900">Order Summary</h2>
+                            <div className="px-5 py-4 border-b border-gray-100 rounded-t-2xl"
+                                style={{ background: 'linear-gradient(180deg, rgba(var(--color-primary-rgb),0.05), transparent)' }}>
+                                <h2 className="text-[15px] font-bold text-gray-900 flex items-center gap-2">
+                                    <FiShoppingCart size={15} className="text-[var(--color-primary)]" />
+                                    Order Summary
+                                </h2>
                             </div>
 
                             {/* Coupon Input */}
@@ -782,14 +797,15 @@ const CartPage = () => {
                                     </div>
                                 )}
                                 {!canCheckout ? (
-                                    <button disabled className="w-full flex items-center justify-center gap-2 py-3 bg-gray-200 text-gray-400 rounded-md text-sm font-semibold cursor-not-allowed">
+                                    <button disabled className="w-full flex items-center justify-center gap-2 py-3.5 bg-gray-200 text-gray-400 rounded-full text-sm font-semibold cursor-not-allowed">
                                         {hasVariantIssues ? 'Select Variations to Continue' : 'Proceed to Checkout (0)'}
                                     </button>
                                 ) : (
                                     <Link
                                         href="/checkout"
                                         onClick={goCheckout}
-                                        className="w-full flex items-center justify-center gap-2 py-3 bg-[var(--color-primary)] text-white rounded-md text-sm font-semibold hover:opacity-90 transition-opacity shadow-sm"
+                                        className="w-full flex items-center justify-center gap-2 py-3.5 text-white rounded-full text-sm font-bold transition-all hover:-translate-y-0.5"
+                                        style={{ background: 'linear-gradient(140deg, var(--color-primary), var(--color-primary-dark))', boxShadow: '0 12px 26px -10px rgba(var(--color-primary-rgb),0.85)' }}
                                     >
                                         Proceed to Checkout ({selectedIds.length})
                                         <FiChevronRight size={16} />
@@ -815,7 +831,8 @@ const CartPage = () => {
                     <Link
                         href="/checkout"
                         onClick={goCheckout}
-                        className="flex items-center justify-center gap-1.5 px-6 py-3 bg-[var(--color-primary)] text-white rounded-md text-sm font-semibold hover:opacity-90 transition-opacity flex-shrink-0"
+                        className="flex items-center justify-center gap-1.5 px-6 py-3 text-white rounded-full text-sm font-bold transition-transform active:scale-95 flex-shrink-0"
+                        style={{ background: 'linear-gradient(140deg, var(--color-primary), var(--color-primary-dark))' }}
                     >
                         Checkout ({selectedIds.length})
                         <FiChevronRight size={16} />

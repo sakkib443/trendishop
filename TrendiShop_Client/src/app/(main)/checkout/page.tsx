@@ -20,8 +20,16 @@ import {
 import Link from 'next/link';
 import { toast } from 'react-hot-toast';
 import { trackBeginCheckout, trackPurchase } from '@/lib/marketing';
+import CheckoutSteps from '@/components/shared/CheckoutSteps';
 
 const COUPON_STORAGE_KEY = 'trendishop_applied_coupon';
+
+/* Home-matching surfaces: warm cream page + a premium, soft-shadowed card. */
+const PAGE_BG =
+    'radial-gradient(60% 50% at 92% -6%, rgba(250,204,21,0.06), transparent 70%),' +
+    'radial-gradient(48% 40% at 0% 16%, rgba(245,158,11,0.035), transparent 72%),' +
+    'linear-gradient(180deg, #FFFFFF 0%, #FFFEF9 55%, #FFFCF2 100%)';
+const CARD = 'bg-white rounded-2xl border border-gray-100 shadow-[0_2px_24px_-10px_rgba(30,25,20,0.14)]';
 
 // ─── Payment methods offered ──────────────────────────────────────────────
 // Cash on Delivery always. bKash, Nagad, Rocket and bank transfer only while the super admin
@@ -534,7 +542,7 @@ const CheckoutPage = () => {
     if (items.length === 0) return null;
 
     return (
-        <div className="bg-[#F8FAFC] min-h-screen pb-24">
+        <div className="min-h-screen pb-24" style={{ background: PAGE_BG }}>
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-6 max-w-6xl">
 
                 {/* Back */}
@@ -543,7 +551,13 @@ const CheckoutPage = () => {
                     Back to Cart
                 </Link>
 
-                <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-5">Checkout</h1>
+                <div className="flex flex-wrap items-end justify-between gap-4 mb-6">
+                    <div>
+                        <h1 className="text-2xl sm:text-[28px] font-extrabold text-gray-900 tracking-tight">Checkout</h1>
+                        <p className="text-sm text-gray-500 mt-0.5">Almost there — confirm your details and place the order.</p>
+                    </div>
+                    <CheckoutSteps current={1} />
+                </div>
 
                 {/* Guest Banner */}
                 {!isAuthenticated && (
@@ -563,9 +577,9 @@ const CheckoutPage = () => {
                         <div className="lg:col-span-7 space-y-5">
 
                             {/* ── Shipping Address ── */}
-                            <div className="bg-white rounded-lg border border-gray-200">
+                            <div className={CARD}>
                                 <div className="px-5 py-3.5 border-b border-gray-100">
-                                    <h2 className="text-sm font-semibold text-gray-900">Shipping Address</h2>
+                                    <h2 className="text-[15px] font-bold text-gray-900">Shipping Address</h2>
                                 </div>
                                 {/* Saved addresses — auto-filled from the dashboard. Pick one or add a new one. */}
                                 {isAuthenticated && savedAddresses.length > 0 && (
@@ -709,9 +723,9 @@ const CheckoutPage = () => {
 
 
                             {/* ── Payment Method ── */}
-                            <div className="bg-white rounded-lg border border-gray-200">
+                            <div className={CARD}>
                                 <div className="px-5 py-3.5 border-b border-gray-100">
-                                    <h2 className="text-sm font-semibold text-gray-900">Payment Method</h2>
+                                    <h2 className="text-[15px] font-bold text-gray-900">Payment Method</h2>
                                 </div>
                                 <div className="px-5 py-5 space-y-3">
 
@@ -848,9 +862,9 @@ const CheckoutPage = () => {
 
                         {/* ══ RIGHT COLUMN: Sticky Order Summary ══ */}
                         <div className="lg:col-span-5 lg:sticky lg:top-24 h-fit">
-                            <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+                            <div className={`${CARD} overflow-hidden`}>
                                 <div className="px-5 py-3.5 border-b border-gray-100 flex items-center justify-between">
-                                    <h2 className="text-sm font-semibold text-gray-900">Order Summary</h2>
+                                    <h2 className="text-[15px] font-bold text-gray-900">Order Summary</h2>
                                     <span className="text-xs text-gray-500 bg-gray-100 px-2.5 py-0.5 rounded-full font-medium">
                                         {totalQuantity} item{totalQuantity > 1 ? 's' : ''}
                                     </span>
@@ -860,7 +874,7 @@ const CheckoutPage = () => {
                                 <div className="divide-y divide-gray-50 max-h-80 overflow-y-auto px-5">
                                     {items.map((item) => (
                                         <div key={item.id} className="flex gap-3.5 py-3.5 items-center">
-                                            <div className="w-14 h-14 bg-gray-50 rounded border border-gray-100 p-1 flex-shrink-0 relative">
+                                            <div className="w-14 h-14 rounded-lg border border-gray-100 bg-gradient-to-br from-gray-50 to-white p-1.5 flex-shrink-0 relative">
                                                 {/* eslint-disable-next-line @next/next/no-img-element */}
                                                 <img src={item.image} alt={item.name} className="w-full h-full object-contain" />
                                             </div>
@@ -991,7 +1005,8 @@ const CheckoutPage = () => {
                                     <button
                                         type="submit"
                                         disabled={isSubmitting}
-                                        className="w-full flex items-center justify-center gap-2 py-3.5 bg-[var(--color-primary)] text-white rounded text-sm font-semibold hover:brightness-95 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                                        className="w-full flex items-center justify-center gap-2 py-3.5 text-white rounded-full text-sm font-bold transition-all hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+                                        style={{ background: 'linear-gradient(140deg, var(--color-primary), var(--color-primary-dark))', boxShadow: '0 12px 26px -10px rgba(var(--color-primary-rgb),0.85)' }}
                                     >
                                         {isSubmitting ? (
                                             <>
