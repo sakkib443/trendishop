@@ -758,7 +758,7 @@ export default function ProductDetailsPage() {
                                     )}
                                     {contactChannels.phoneHref && (
                                         <a href={contactChannels.phoneHref}
-                                            style={{ flex: 1, height: '38px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: 'var(--color-primary)', color: '#fff', fontWeight: 700, fontSize: '12.5px', borderRadius: '6px', textDecoration: 'none' }}>
+                                            style={{ flex: 1, height: '38px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: '#fff', color: 'var(--color-primary)', border: '1.5px solid var(--color-primary-border)', fontWeight: 700, fontSize: '12.5px', borderRadius: '6px', textDecoration: 'none' }}>
                                             <FiPhone size={14} /> Call Now
                                         </a>
                                     )}
