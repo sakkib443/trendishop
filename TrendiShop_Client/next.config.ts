@@ -64,7 +64,13 @@ const nextConfig: NextConfig = {
       },
       // Uploaded product/category images. fileToUrl() on the API builds these
       // from BACKEND_URL, so the API's own host has to be allowed here or
-      // next/image refuses to optimise them.
+      // next/image refuses to optimise them. The Coolify deployment serves the
+      // API from a *.sslip.io host, so allow any of them (covers the current
+      // backend domain and survives a redeploy that changes the sub-domain).
+      {
+        protocol: "https",
+        hostname: "**.sslip.io",
+      },
       {
         protocol: "https",
         hostname: "api.13.140.168.218.sslip.io",
