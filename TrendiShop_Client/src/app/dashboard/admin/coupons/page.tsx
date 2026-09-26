@@ -446,6 +446,8 @@ export default function CouponsPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingCoupon, setEditingCoupon] = useState<any>(null);
     const [search, setSearch] = useState('');
+    const [selected, setSelected] = useState<Set<string>>(new Set());
+    const [bulkStatus, setBulkStatus] = useState('');
 
     const { data: couponsData, isLoading, refetch } = useGetCouponsQuery(undefined);
     const [createCoupon] = useCreateCouponMutation();
@@ -511,6 +513,49 @@ export default function CouponsPage() {
         (c.description || c.name || '').toLowerCase().includes(search.toLowerCase())
     );
 
+    // ── Bulk selection ──
+    const clearSelection = () => setSelected(new Set());
+    const allSelected = filteredCoupons.length > 0 && filteredCoupons.every((c: any) => selected.has(c._id));
+    const someSelected = selected.size > 0 && !allSelected;
+    const toggleOne = (id: string) => setSelected((prev) => {
+        const next = new Set(prev);
+        if (next.has(id)) next.delete(id); else next.add(id);
+        return next;
+    });
+    const toggleAll = () => setSelected((prev) => {
+        const next = new Set(prev);
+        if (filteredCoupons.every((c: any) => next.has(c._id))) filteredCoupons.forEach((c: any) => next.delete(c._id));
+        else filteredCoupons.forEach((c: any) => next.add(c._id));
+        return next;
+    });
+
+    const handleBulkStatus = async (val: string) => {
+        const ids = Array.from(selected);
+        if (!ids.length || !val) return;
+        const isActive = val === 'active';
+        const tId = toast.loading(`Updating ${ids.length} coupon${ids.length > 1 ? 's' : ''}…`);
+        const results = await Promise.allSettled(ids.map((id) => updateCoupon({ id, isActive }).unwrap()));
+        const ok = results.filter((r) => r.status === 'fulfilled').length;
+        const failed = results.length - ok;
+        if (ok > 0) toast.success(`${isActive ? 'Activated' : 'Deactivated'} ${ok} coupon${ok > 1 ? 's' : ''}${failed ? ` · ${failed} failed` : ''}`, { id: tId });
+        else toast.error('Could not update the selected coupons', { id: tId });
+        clearSelection();
+        setBulkStatus('');
+    };
+
+    const handleBulkDelete = async () => {
+        const ids = Array.from(selected);
+        if (!ids.length) return;
+        if (!window.confirm(`Delete ${ids.length} coupon${ids.length > 1 ? 's' : ''}?`)) return;
+        const tId = toast.loading(`Deleting ${ids.length} coupon${ids.length > 1 ? 's' : ''}…`);
+        const results = await Promise.allSettled(ids.map((id) => deleteCoupon(id).unwrap()));
+        const ok = results.filter((r) => r.status === 'fulfilled').length;
+        const failed = results.length - ok;
+        if (ok > 0) toast.success(`Deleted ${ok} coupon${ok > 1 ? 's' : ''}${failed ? ` · ${failed} failed` : ''}`, { id: tId });
+        else toast.error('Could not delete the selected coupons', { id: tId });
+        clearSelection();
+    };
+
     return (
         <div className="space-y-6">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -545,10 +590,46 @@ export default function CouponsPage() {
                         placeholder="Search by code or name..."
                         className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-md focus:ring-2 focus:ring-[var(--color-primary)] outline-none"
                         value={search}
-                        onChange={(e) => setSearch(e.target.value)}
+                        onChange={(e) => { setSearch(e.target.value); clearSelection(); }}
                     />
                 </div>
             </div>
+
+            {/* Bulk action bar */}
+            {selected.size > 0 && (
+                <div className="flex flex-col gap-3 rounded-2xl border border-[var(--color-primary-border)] bg-[var(--color-primary-lightest)] px-4 py-3 sm:flex-row sm:items-center">
+                    <p className="text-sm font-medium text-gray-800">
+                        <span className="mr-2 inline-flex h-6 min-w-6 items-center justify-center rounded-full bg-[var(--color-primary)] px-2 text-xs text-white">{selected.size}</span>
+                        coupon{selected.size > 1 ? 's' : ''} selected
+                    </p>
+                    <div className="flex flex-wrap items-center gap-2 sm:ml-auto">
+                        <select
+                            aria-label="Change status"
+                            value={bulkStatus}
+                            onChange={(e) => handleBulkStatus(e.target.value)}
+                            className="h-9 w-48 cursor-pointer rounded-full border border-gray-200 bg-white px-4 text-sm text-gray-800 outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                        >
+                            <option value="">Change status to…</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                        <button
+                            type="button"
+                            onClick={handleBulkDelete}
+                            className="inline-flex h-9 items-center gap-1.5 rounded-full bg-red-600 px-4 text-sm font-semibold text-white transition hover:bg-red-700"
+                        >
+                            <FiTrash2 size={15} /> Delete
+                        </button>
+                        <button
+                            type="button"
+                            onClick={clearSelection}
+                            className="inline-flex h-9 items-center gap-1.5 rounded-full px-4 text-sm font-semibold text-gray-600 transition hover:bg-gray-100"
+                        >
+                            <FiX size={15} /> Clear
+                        </button>
+                    </div>
+                </div>
+            )}
 
             {/* Coupons List */}
             <div className="bg-white rounded-md shadow-sm border border-gray-200 overflow-hidden">
@@ -556,6 +637,16 @@ export default function CouponsPage() {
                     <table className="w-full text-left">
                         <thead className="bg-gray-50 border-b border-gray-200">
                             <tr>
+                                <th className="px-6 py-4 w-10">
+                                    <input
+                                        type="checkbox"
+                                        aria-label="Select all coupons"
+                                        ref={(el) => { if (el) el.indeterminate = someSelected; }}
+                                        checked={allSelected}
+                                        onChange={toggleAll}
+                                        className="h-4 w-4 cursor-pointer rounded border-gray-300 accent-[var(--color-primary)]"
+                                    />
+                                </th>
                                 <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Coupon Details</th>
                                 <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Discount</th>
                                 <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Applicable To</th>
@@ -567,16 +658,25 @@ export default function CouponsPage() {
                             {isLoading ? (
                                 [...Array(5)].map((_, i) => (
                                     <tr key={i} className="animate-pulse">
-                                        <td colSpan={5} className="px-6 py-4"><div className="h-12 bg-gray-100 rounded w-full"></div></td>
+                                        <td colSpan={6} className="px-6 py-4"><div className="h-12 bg-gray-100 rounded w-full"></div></td>
                                     </tr>
                                 ))
                             ) : filteredCoupons.length === 0 ? (
                                 <tr>
-                                    <td colSpan={5} className="px-6 py-12 text-center text-gray-500">No coupons found.</td>
+                                    <td colSpan={6} className="px-6 py-12 text-center text-gray-500">No coupons found.</td>
                                 </tr>
                             ) : (
                                 filteredCoupons.map((coupon: any) => (
-                                    <tr key={coupon._id} className="hover:bg-gray-50/50">
+                                    <tr key={coupon._id} className={selected.has(coupon._id) ? 'bg-[var(--color-primary-lightest)]' : 'hover:bg-gray-50/50'}>
+                                        <td className="px-6 py-4">
+                                            <input
+                                                type="checkbox"
+                                                aria-label={`Select ${coupon.code}`}
+                                                checked={selected.has(coupon._id)}
+                                                onChange={() => toggleOne(coupon._id)}
+                                                className="h-4 w-4 cursor-pointer rounded border-gray-300 accent-[var(--color-primary)]"
+                                            />
+                                        </td>
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-3">
                                                 <div className="w-10 h-10 rounded-md bg-[var(--color-primary-lightest)] flex items-center justify-center text-[var(--color-primary)]">

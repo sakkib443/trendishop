@@ -14,7 +14,7 @@ import {
     FiStar, FiX, FiZoomIn, FiCopy, FiShare2, FiDownload,
     FiChevronUp, FiChevronDown, FiMessageSquare,
     FiEye, FiChevronRight, FiChevronLeft, FiSend,
-    FiMapPin, FiTruck, FiDollarSign, FiRefreshCw, FiShield, FiClock
+    FiMapPin, FiTruck, FiDollarSign, FiRefreshCw, FiShield, FiClock, FiPhone
 } from 'react-icons/fi';
 import { useGetProductBySlugQuery, useGetRelatedProductsQuery, useIncrementProductStatMutation } from '@/redux/api/productApi';
 import { trackViewItem } from '@/lib/marketing';
@@ -23,7 +23,8 @@ import { useGetShippingSettingsQuery } from '@/redux/api/shippingApi';
 import { useAppDispatch, useAppSelector } from '@/redux';
 import { addToCart, updateQuantity } from '@/redux/slices/cartSlice';
 import { useCreateInquiryMutation } from '@/redux/api/inquiryApi';
-import { useStartConversationMutation } from '@/redux/api/chatApi';
+import { useGetSiteContentQuery } from '@/redux/api/siteContentApi';
+import { resolveContactChannels } from '@/utils/contactLinks';
 import { useWishlist } from '@/hooks/useWishlist';
 import { toast } from 'react-hot-toast';
 import NewProductCard, { CommentsPopup } from '@/components/shared/NewProductCard';
@@ -42,7 +43,8 @@ export default function ProductDetailsPage() {
     const dispatch = useAppDispatch();
     const { isAuthenticated } = useAppSelector((state: any) => state.auth);
     const [createInquiry] = useCreateInquiryMutation();
-    const [startConversation, { isLoading: isStartingChat }] = useStartConversationMutation();
+    const { data: siteRes } = useGetSiteContentQuery({});
+    const contactChannels = resolveContactChannels(siteRes?.data);
     const [incrementStat] = useIncrementProductStatMutation();
     const [quantity, setQuantity] = useState(1);
     const [selectedImage, setSelectedImage] = useState(0);
@@ -397,23 +399,6 @@ export default function ProductDetailsPage() {
         }
     };
 
-    const handleChatNow = async () => {
-        // Chatting requires an account — bounce to login and return to this product.
-        if (!isAuthenticated) {
-            const back = `/product/${Array.isArray(slug) ? slug[0] : slug}`;
-            router.push(`/login?redirect=${encodeURIComponent(back)}`);
-            return;
-        }
-        try {
-            await startConversation({ type: 'customer-support' }).unwrap();
-            router.push('/dashboard/user/messages?support=1');
-        } catch (err) {
-            console.error(err);
-            // Last resort: still land in messages (support lane) instead of failing.
-            router.push('/dashboard/user/messages?support=1');
-        }
-    };
-
     return (
         <>
             <div style={{ minHeight: '100vh', background: 'radial-gradient(55% 45% at 88% 0%, rgba(var(--color-primary-rgb), 0.06), transparent 70%), radial-gradient(45% 40% at 0% 22%, rgba(var(--color-primary-rgb), 0.04), transparent 70%), #F8FAFC' }}>
@@ -764,10 +749,20 @@ export default function ProductDetailsPage() {
                             <div style={{ padding: '14px' }}>
                                 <p style={{ fontSize: '11px', color: '#9ca3af', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', margin: '0 0 8px' }}>Need help?</p>
                                 <p style={{ fontSize: '13px', fontWeight: 700, color: '#111', margin: '0 0 12px' }}>TrendiShop</p>
-                                <button onClick={handleChatNow} disabled={isStartingChat}
-                                    style={{ width: '100%', height: '34px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px', background: '#fff', border: '1.5px solid var(--color-primary)', color: 'var(--color-primary)', fontWeight: 600, fontSize: '12px', cursor: isStartingChat ? 'wait' : 'pointer', borderRadius: '4px', opacity: isStartingChat ? 0.7 : 1 }}>
-                                    <FiMessageSquare size={13} /> {isStartingChat ? 'Opening...' : 'Chat Now'}
-                                </button>
+                                <div style={{ display: 'flex', gap: '8px' }}>
+                                    {contactChannels.whatsappHref && (
+                                        <a href={contactChannels.whatsappHref} target="_blank" rel="noopener noreferrer"
+                                            style={{ flex: 1, height: '38px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: '#25D366', color: '#fff', fontWeight: 700, fontSize: '12.5px', borderRadius: '6px', textDecoration: 'none' }}>
+                                            <FaWhatsapp size={15} /> WhatsApp
+                                        </a>
+                                    )}
+                                    {contactChannels.phoneHref && (
+                                        <a href={contactChannels.phoneHref}
+                                            style={{ flex: 1, height: '38px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: 'var(--color-primary)', color: '#fff', fontWeight: 700, fontSize: '12.5px', borderRadius: '6px', textDecoration: 'none' }}>
+                                            <FiPhone size={14} /> Call Now
+                                        </a>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </div>

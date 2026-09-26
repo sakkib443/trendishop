@@ -203,10 +203,17 @@ const NewProductCard: React.FC<NewProductCardProps> = ({ product }) => {
                 </span>
             </Link>
 
-            {/* Discount, top left */}
-            {discountPercent > 0 && (
-                <span className='pc-badge-off absolute left-3 top-3 z-20'>{discountPercent}%</span>
-            )}
+            {/* Offer + stock badges, stacked neatly at the top-left so they read as
+                one organised block over the picture instead of floating loose near
+                the name. Discount first, then the low-stock nudge. */}
+            <div className='absolute left-3 top-3 z-20 flex flex-col items-start gap-2'>
+                {discountPercent > 0 && (
+                    <span className='pc-badge-off'>{discountPercent}%</span>
+                )}
+                {inStock && product.stock !== undefined && product.stock <= 10 && (
+                    <span className='pc-badge-low'>Only {product.stock} left!</span>
+                )}
+            </div>
 
             {/* Standing, top right. Only shown once something has actually sold —
                 a "Top Selling" badge on every card means nothing. */}
@@ -214,14 +221,6 @@ const NewProductCard: React.FC<NewProductCardProps> = ({ product }) => {
                 <span className='pc-badge-top absolute right-3 top-3 z-20'>
                     <FiTrendingUp size={12} strokeWidth={2.5} />
                     Top Selling
-                </span>
-            )}
-
-            {/* Low stock, over the foot of the picture. Under ten is a real reason
-                to hurry; anything more and the badge is just decoration. */}
-            {inStock && product.stock !== undefined && product.stock <= 10 && (
-                <span className='pc-badge-low absolute bottom-[30%] left-3 z-20'>
-                    Only {product.stock} left!
                 </span>
             )}
 

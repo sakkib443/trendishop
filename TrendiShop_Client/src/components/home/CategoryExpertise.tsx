@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { FiX } from 'react-icons/fi';
 import { useGetCategoriesQuery } from '@/redux/api/categoryApi';
+import { CategoryTileSkeletonGrid } from '@/components/shared/Skeletons';
 
 interface Category {
     _id: string;
@@ -66,17 +67,6 @@ const LOCAL_CATEGORY_IMAGES: Record<string, string> = {
     cutlery: '/categories/cutlery.webp',
 };
 
-const FALLBACK_CATEGORIES: Category[] = [
-    { _id: 'f-cookware',       name: 'Cookware',       slug: 'cookware',       icon: '🍳', image: LOCAL_CATEGORY_IMAGES.cookware },
-    { _id: 'f-dinnerware',     name: 'Dinnerware',     slug: 'dinnerware',     icon: '🍽️', image: LOCAL_CATEGORY_IMAGES.dinnerware },
-    { _id: 'f-kitchen-tools',  name: 'Kitchen Tools',  slug: 'kitchen-tools',  icon: '🔪', image: LOCAL_CATEGORY_IMAGES['kitchen-tools'] },
-    { _id: 'f-food-storage',   name: 'Food Storage',   slug: 'food-storage',   icon: '🫙', image: LOCAL_CATEGORY_IMAGES['food-storage'] },
-    { _id: 'f-appliances',     name: 'Appliances',     slug: 'appliances',     icon: '⚡', image: LOCAL_CATEGORY_IMAGES.appliances },
-    { _id: 'f-bakeware',       name: 'Bakeware',       slug: 'bakeware',       icon: '🧁', image: LOCAL_CATEGORY_IMAGES.bakeware },
-    { _id: 'f-drinkware',      name: 'Drinkware',      slug: 'drinkware',      icon: '🥤', image: LOCAL_CATEGORY_IMAGES.drinkware },
-    { _id: 'f-cutlery',        name: 'Cutlery',        slug: 'cutlery',        icon: '🍴', image: LOCAL_CATEGORY_IMAGES.cutlery },
-];
-
 function categoryImage(cat: Category): string | undefined {
     const dbImg = cat.image || (cat.icon && (cat.icon.startsWith('http') || cat.icon.startsWith('/')) ? cat.icon : undefined);
     const isStockPhoto = Boolean(dbImg && (dbImg.includes('unsplash.com') || dbImg.includes('picsum.photos')));
@@ -85,11 +75,13 @@ function categoryImage(cat: Category): string | undefined {
 }
 
 const CategoryExpertise: React.FC<CategoryExpertiseProps> = ({ onClose }) => {
-    const { data: categoriesData } = useGetCategoriesQuery({});
-    const apiCategories: Category[] = categoriesData?.data || [];
-    /* Six, always. The row is built for six columns, so a seventh would start a
-       second row holding one lonely tile. */
-    const categories: Category[] = (apiCategories.length > 0 ? apiCategories : FALLBACK_CATEGORIES).slice(0, 7);
+    const { data: categoriesData, isLoading } = useGetCategoriesQuery({});
+    /* Seven, always. The row is built for seven columns, so an eighth would start
+       a second row holding one lonely tile. Real categories only — no fallback. */
+    const categories: Category[] = (categoriesData?.data || []).slice(0, 7);
+
+    // API returned no categories: render nothing rather than fake tiles.
+    if (!isLoading && categories.length === 0) return null;
 
     return (
         <section className="w-full">
@@ -128,6 +120,9 @@ const CategoryExpertise: React.FC<CategoryExpertiseProps> = ({ onClose }) => {
                 {/* Full-width grid — no carousel, no arrows. The column count is
                     chosen so a row of 6 or 8 categories fills the container exactly;
                     the tiles are square and stretch to whatever width is left over. */}
+                {isLoading ? (
+                    <CategoryTileSkeletonGrid count={7} />
+                ) : (
                 <div className="grid grid-cols-2 min-[480px]:grid-cols-3 sm:grid-cols-4 lg:grid-cols-7 gap-3 sm:gap-4">
                     {categories.map(cat => (
                         <Link
@@ -161,6 +156,7 @@ const CategoryExpertise: React.FC<CategoryExpertiseProps> = ({ onClose }) => {
                         </Link>
                     ))}
                 </div>
+                )}
             </div>
         </section>
     );

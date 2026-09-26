@@ -4,8 +4,8 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { LuPlus, LuUpload, LuPencil, LuTrash2, LuExternalLink, LuPackage } from 'react-icons/lu';
-import { useGetProductsQuery, useGetProductStatsQuery, useDeleteProductMutation } from '@/redux/api/productApi';
+import { LuPlus, LuUpload, LuPencil, LuTrash2, LuExternalLink, LuPackage, LuX } from 'react-icons/lu';
+import { useGetProductsQuery, useGetProductStatsQuery, useDeleteProductMutation, useUpdateProductMutation } from '@/redux/api/productApi';
 import { toast } from 'react-hot-toast';
 import BulkUploadModal from './BulkUploadModal';
 import { useGetUnitsQuery, findUnit } from '@/redux/api/unitApi';
@@ -13,7 +13,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
 import {
     PageHeader, Btn, SearchInput, SelectPill, FilterBar, StatTile, Badge, TableCard, TH, TD, TR,
-    EmptyRow, SkeletonRows, Pager, RowMenu, taka, fmtDateTime, type Tone,
+    EmptyRow, SkeletonRows, Pager, RowMenu, taka, fmtDateTime, cx, type Tone,
 } from '@/components/admin/ui';
 
 const PAGE_SIZE = 10;
@@ -24,6 +24,8 @@ const STATUS: Record<string, { label: string; tone: Tone }> = {
     draft: { label: 'Draft', tone: 'gray' },
     'out-of-stock': { label: 'Out of stock', tone: 'red' },
 };
+
+const STATUS_OPTIONS = Object.entries(STATUS).map(([value, s]) => ({ value, label: s.label }));
 
 /** Debounce the search box so every keystroke doesn't hit the API. */
 function useDebounced<T>(value: T, ms = 300) {
@@ -37,6 +39,8 @@ export default function ProductsPage() {
     const [status, setStatus] = useState('all');
     const [page, setPage] = useState(1);
     const [showBulkUpload, setShowBulkUpload] = useState(false);
+    const [selected, setSelected] = useState<Set<string>>(new Set());
+    const [bulkStatus, setBulkStatus] = useState('');
     const q = useDebounced(search);
 
     const { data, isLoading, isFetching } = useGetProductsQuery({
@@ -50,6 +54,7 @@ export default function ProductsPage() {
     });
     const { data: statsData } = useGetProductStatsQuery(undefined);
     const [deleteProduct] = useDeleteProductMutation();
+    const [updateProduct] = useUpdateProductMutation();
     // Editors add and update products; deleting and bulk upload are for admins.
     const isEditor = useSelector((s: RootState) => s.auth.user?.role) === 'editor';
     const { data: units } = useGetUnitsQuery({ scope: 'all' });
@@ -60,7 +65,10 @@ export default function ProductsPage() {
     const meta = data?.meta || { total: 0, totalPages: 1 };
     const stats = statsData?.data || { total: 0, active: 0, draft: 0, outOfStock: 0 };
 
-    const pick = (s: string) => { setStatus(s); setPage(1); };
+    // Any change of filter or page starts a fresh selection.
+    const clearSelection = () => setSelected(new Set());
+    const pick = (s: string) => { setStatus(s); setPage(1); clearSelection(); };
+    const goToPage = (p: number) => { setPage(p); clearSelection(); };
 
     const handleDelete = async (p: any) => {
         if (!window.confirm(`Delete "${p.name}"? This cannot be undone.`)) return;
@@ -70,6 +78,48 @@ export default function ProductsPage() {
         } catch (err: any) {
             toast.error(err?.data?.message || 'Failed to delete product');
         }
+    };
+
+    // ── Bulk selection ──
+    const allSelected = products.length > 0 && products.every((p: any) => selected.has(p._id));
+    const someSelected = selected.size > 0 && !allSelected;
+
+    const toggleOne = (id: string) => setSelected((prev) => {
+        const next = new Set(prev);
+        if (next.has(id)) next.delete(id); else next.add(id);
+        return next;
+    });
+    const toggleAll = () => setSelected((prev) => {
+        const next = new Set(prev);
+        if (products.every((p: any) => next.has(p._id))) products.forEach((p: any) => next.delete(p._id));
+        else products.forEach((p: any) => next.add(p._id));
+        return next;
+    });
+
+    const handleBulkStatus = async (newStatus: string) => {
+        const ids = Array.from(selected);
+        if (!ids.length || !newStatus) return;
+        const tId = toast.loading(`Updating ${ids.length} product${ids.length > 1 ? 's' : ''}…`);
+        const results = await Promise.allSettled(ids.map((id) => updateProduct({ id, data: { status: newStatus } }).unwrap()));
+        const ok = results.filter((r) => r.status === 'fulfilled').length;
+        const failed = results.length - ok;
+        if (ok > 0) toast.success(`Updated ${ok} product${ok > 1 ? 's' : ''} to ${STATUS[newStatus]?.label || newStatus}${failed ? ` · ${failed} failed` : ''}`, { id: tId });
+        else toast.error('Could not update the selected products', { id: tId });
+        clearSelection();
+        setBulkStatus('');
+    };
+
+    const handleBulkDelete = async () => {
+        const ids = Array.from(selected);
+        if (!ids.length) return;
+        if (!window.confirm(`Delete ${ids.length} product${ids.length > 1 ? 's' : ''}? This cannot be undone.`)) return;
+        const tId = toast.loading(`Deleting ${ids.length} product${ids.length > 1 ? 's' : ''}…`);
+        const results = await Promise.allSettled(ids.map((id) => deleteProduct(id).unwrap()));
+        const ok = results.filter((r) => r.status === 'fulfilled').length;
+        const failed = results.length - ok;
+        if (ok > 0) toast.success(`Deleted ${ok} product${ok > 1 ? 's' : ''}${failed ? ` · ${failed} failed` : ''}`, { id: tId });
+        else toast.error('Could not delete the selected products', { id: tId });
+        clearSelection();
     };
 
     return (
@@ -93,7 +143,7 @@ export default function ProductsPage() {
             </div>
 
             <FilterBar>
-                <SearchInput value={search} onChange={(v) => { setSearch(v); setPage(1); }} placeholder="Search products…" />
+                <SearchInput value={search} onChange={(v) => { setSearch(v); setPage(1); clearSelection(); }} placeholder="Search products…" />
                 <SelectPill
                     ariaLabel="Status"
                     value={status}
@@ -108,12 +158,43 @@ export default function ProductsPage() {
                 />
             </FilterBar>
 
+            {/* Bulk action bar */}
+            {selected.size > 0 && (
+                <div className="mb-4 flex flex-col gap-3 rounded-2xl border border-[var(--color-primary-border)] bg-[var(--color-primary-lightest)] px-4 py-3 sm:flex-row sm:items-center">
+                    <p className="text-sm font-medium text-gray-800">
+                        <span className="mr-2 inline-flex h-6 min-w-6 items-center justify-center rounded-full bg-[var(--color-primary)] px-2 text-xs text-white">{selected.size}</span>
+                        product{selected.size > 1 ? 's' : ''} selected
+                    </p>
+                    <div className="flex flex-wrap items-center gap-2 sm:ml-auto">
+                        <SelectPill
+                            ariaLabel="Change status"
+                            className="w-48"
+                            value={bulkStatus}
+                            onChange={handleBulkStatus}
+                            options={[{ value: '', label: 'Change status to…' }, ...STATUS_OPTIONS]}
+                        />
+                        {!isEditor && <Btn variant="danger" icon={<LuTrash2 size={15} />} onClick={handleBulkDelete}>Delete</Btn>}
+                        <Btn variant="ghost" icon={<LuX size={15} />} onClick={clearSelection}>Clear</Btn>
+                    </div>
+                </div>
+            )}
+
             <TableCard
-                footer={<Pager page={page} totalPages={meta.totalPages} total={meta.total} pageSize={PAGE_SIZE} count={products.length} onPage={setPage} noun="products" />}
+                footer={<Pager page={page} totalPages={meta.totalPages} total={meta.total} pageSize={PAGE_SIZE} count={products.length} onPage={goToPage} noun="products" />}
             >
                 <table className={`w-full ${isFetching && !isLoading ? 'opacity-60' : ''}`}>
                     <thead>
                         <tr>
+                            <th className={`${TH} w-10`}>
+                                <input
+                                    type="checkbox"
+                                    aria-label="Select all products on this page"
+                                    ref={(el) => { if (el) el.indeterminate = someSelected; }}
+                                    checked={allSelected}
+                                    onChange={toggleAll}
+                                    className="h-4 w-4 cursor-pointer rounded border-gray-300 accent-[var(--color-primary)]"
+                                />
+                            </th>
                             <th className={`${TH} w-12`}>#</th>
                             <th className={TH}>Product</th>
                             <th className={TH}>Category</th>
@@ -125,8 +206,8 @@ export default function ProductsPage() {
                         </tr>
                     </thead>
                     <tbody>
-                        {isLoading ? <SkeletonRows cols={8} /> : products.length === 0 ? (
-                            <EmptyRow colSpan={8}>
+                        {isLoading ? <SkeletonRows cols={9} /> : products.length === 0 ? (
+                            <EmptyRow colSpan={9}>
                                 <LuPackage size={28} className="mx-auto mb-2 text-gray-300" />
                                 {search || status !== 'all' ? 'No products match these filters.' : 'No products yet — add your first one.'}
                             </EmptyRow>
@@ -135,7 +216,16 @@ export default function ProductsPage() {
                             const low = p.stock <= (p.lowStockThreshold ?? 5);
                             const was = p.originalPrice && p.originalPrice > p.price ? p.originalPrice : 0;
                             return (
-                                <tr key={p._id} className={TR}>
+                                <tr key={p._id} className={cx(TR, selected.has(p._id) && 'bg-[var(--color-primary-lightest)] hover:bg-[var(--color-primary-lightest)]')}>
+                                    <td className={TD}>
+                                        <input
+                                            type="checkbox"
+                                            aria-label="Select product"
+                                            checked={selected.has(p._id)}
+                                            onChange={() => toggleOne(p._id)}
+                                            className="h-4 w-4 cursor-pointer rounded border-gray-300 accent-[var(--color-primary)]"
+                                        />
+                                    </td>
                                     <td className={`${TD} text-gray-400`}>{(page - 1) * PAGE_SIZE + i + 1}</td>
                                     <td className={TD}>
                                         <div className="flex min-w-[260px] items-center gap-3">

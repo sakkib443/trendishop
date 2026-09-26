@@ -23,11 +23,11 @@ const HeroBackdrop: React.FC = () => {
             aria-hidden
             className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[880px] overflow-hidden"
             style={{
-                // Solid through the hero and the whole category row, then dissolved
-                // into the base gradient before the product grids begin, so the
-                // layer's bottom edge never shows as a hard line.
-                WebkitMaskImage: 'linear-gradient(to bottom, #000 84%, transparent 100%)',
-                maskImage: 'linear-gradient(to bottom, #000 84%, transparent 100%)',
+                // Solid through the hero, then eased down so the lower half — the
+                // tilted floor mesh especially — reads much fainter and dissolves
+                // into the base gradient well before the product grids begin.
+                WebkitMaskImage: 'linear-gradient(to bottom, #000 34%, rgba(0,0,0,0.45) 62%, transparent 92%)',
+                maskImage: 'linear-gradient(to bottom, #000 34%, rgba(0,0,0,0.45) 62%, transparent 92%)',
             }}
         >
             {/* Far wall — a flat mesh high up, revealed only near the top by a
@@ -52,8 +52,8 @@ const HeroBackdrop: React.FC = () => {
                     className="absolute inset-0 origin-top [transform:rotateX(62deg)]"
                     style={{
                         backgroundImage:
-                            'linear-gradient(rgba(30, 58, 138, 0.09) 1px, transparent 1px),' +
-                            'linear-gradient(90deg, rgba(30, 58, 138, 0.09) 1px, transparent 1px)',
+                            'linear-gradient(rgba(30, 58, 138, 0.06) 1px, transparent 1px),' +
+                            'linear-gradient(90deg, rgba(30, 58, 138, 0.06) 1px, transparent 1px)',
                         backgroundSize: '52px 52px',
                         // Solid at the near edge (bottom), fading toward the horizon (top).
                         WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, #000 34%, #000 70%, transparent 100%)',

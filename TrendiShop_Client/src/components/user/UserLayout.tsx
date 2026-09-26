@@ -10,7 +10,7 @@ import { LogoMark } from '@/components/shared/Logo';
 import {
     FiUser, FiMapPin, FiCreditCard, FiSettings,
     FiShoppingBag, FiRefreshCw, FiSlash, FiFileText,
-    FiStar, FiMessageCircle, FiHeart,
+    FiStar, FiHeart,
     FiLogOut, FiMenu, FiX, FiChevronRight, FiHome, FiArrowLeft,
 } from 'react-icons/fi';
 
@@ -40,7 +40,6 @@ const SECTIONS: MenuSection[] = [
         ],
     },
     { title: 'My Reviews', href: '/dashboard/user/reviews', icon: FiStar, standalone: true },
-    { title: 'My Messages', href: '/dashboard/user/messages', icon: FiMessageCircle, standalone: true },
     { title: 'My Wishlist', href: '/dashboard/user/wishlist', icon: FiHeart, standalone: true },
     { title: 'Account Settings', href: '/dashboard/user/settings', icon: FiSettings, standalone: true },
 ];

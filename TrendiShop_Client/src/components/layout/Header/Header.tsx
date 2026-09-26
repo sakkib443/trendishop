@@ -19,6 +19,7 @@ import SearchAutocomplete from '@/components/shared/SearchAutocomplete';
 import { useWishlist } from '@/hooks/useWishlist';
 import { telHref } from '@/utils/contactLinks';
 import { homeFor, isStaffRole } from '@/components/admin/access';
+import { CategoryPillSkeletonRow, CategoryListSkeleton } from '@/components/shared/Skeletons';
 
 interface Category {
     _id: string;
@@ -30,17 +31,6 @@ interface Category {
 
 const isCatImg = (c: Category) => Boolean(c.image || (c.icon && (c.icon.startsWith('http') || c.icon.startsWith('/'))));
 const getCatImg = (c: Category) => c.image || c.icon || '';
-
-const FALLBACK_CATEGORIES: Category[] = [
-    { _id: 'f-cookware', name: 'Cookware', slug: 'cookware', icon: '🍳', image: '/categories/cookware.webp' },
-    { _id: 'f-dinnerware', name: 'Dinnerware', slug: 'dinnerware', icon: '🍽️', image: '/categories/dinnerware.webp' },
-    { _id: 'f-kitchen-tools', name: 'Kitchen Tools', slug: 'kitchen-tools', icon: '🔪', image: '/categories/kitchen-tools.webp' },
-    { _id: 'f-food-storage', name: 'Food Storage', slug: 'food-storage', icon: '🫙', image: '/categories/food-storage.webp' },
-    { _id: 'f-appliances', name: 'Appliances', slug: 'appliances', icon: '⚡', image: '/categories/appliances.webp' },
-    { _id: 'f-bakeware', name: 'Bakeware', slug: 'bakeware', icon: '🧁', image: '/categories/bakeware.webp' },
-    { _id: 'f-drinkware', name: 'Drinkware', slug: 'drinkware', icon: '🥤', image: '/categories/drinkware.webp' },
-    { _id: 'f-cutlery', name: 'Cutlery', slug: 'cutlery', icon: '🍴', image: '/categories/cutlery.webp' },
-];
 
 /** Row 2 — the four quick links that sit between the logo and the search field. */
 const PRIMARY_LINKS: { href: string; label: string; highlight?: boolean }[] = [
@@ -84,8 +74,10 @@ const Header: React.FC = () => {
 
     const wishlistHref = '/wishlist';
 
-    const { data: categoriesData } = useGetCategoriesQuery({});
-    const categories: Category[] = categoriesData?.data?.length > 0 ? categoriesData.data : FALLBACK_CATEGORIES;
+    const { data: categoriesData, isLoading: categoriesLoading } = useGetCategoriesQuery({});
+    // Real categories only — never fake/fallback data. While loading we show
+    // skeletons; when empty we render no category pills.
+    const categories: Category[] = categoriesData?.data || [];
     const { data: siteContentRes } = useGetSiteContentQuery(undefined);
     const contact = siteContentRes?.data?.contact || {};
     const contactPhoneHref = telHref(contact.phone);
@@ -434,15 +426,19 @@ const Header: React.FC = () => {
                                     <div className="pl-3 space-y-0.5">
                                         <Link href="/products" onClick={() => setIsMobileMenuOpen(false)}
                                             className="block px-3 py-2 text-gray-600 text-sm rounded-[6px] hover:bg-gray-50">🛒 All Products</Link>
-                                        {categories.map(cat => (
-                                            <Link key={cat._id} href={`/products?category=${cat._id}`} onClick={() => setIsMobileMenuOpen(false)}
-                                                className="flex items-center gap-2 px-3 py-2 text-gray-600 text-sm rounded-[6px] hover:bg-gray-50">
-                                                {isCatImg(cat)
-                                                    ? <img src={getCatImg(cat)} alt="" className="w-4 h-4 object-contain rounded-xs shrink-0" />
-                                                    : cat.icon && <span className="text-sm shrink-0">{cat.icon}</span>}
-                                                {cat.name}
-                                            </Link>
-                                        ))}
+                                        {/* Skeleton while loading; real categories when loaded; nothing
+                                            (just All Products above) when the API returns none. */}
+                                        {categoriesLoading
+                                            ? <CategoryListSkeleton count={6} />
+                                            : categories.map(cat => (
+                                                <Link key={cat._id} href={`/products?category=${cat._id}`} onClick={() => setIsMobileMenuOpen(false)}
+                                                    className="flex items-center gap-2 px-3 py-2 text-gray-600 text-sm rounded-[6px] hover:bg-gray-50">
+                                                    {isCatImg(cat)
+                                                        ? <img src={getCatImg(cat)} alt="" className="w-4 h-4 object-contain rounded-xs shrink-0" />
+                                                        : cat.icon && <span className="text-sm shrink-0">{cat.icon}</span>}
+                                                    {cat.name}
+                                                </Link>
+                                            ))}
                                     </div>
                                 )}
                                 {[...PRIMARY_LINKS.map(l => ({ href: l.href, label: l.label })),
@@ -508,13 +504,17 @@ const Header: React.FC = () => {
                             the rhythm here look accidental. Overflow scrolls sideways,
                             so a longer catalogue never squeezes the row. */}
                         <nav className="hd-pill hd-rail flex items-center gap-1 flex-1 min-w-0 overflow-x-auto h-[var(--hd-control)] rounded-[var(--hd-radius)] bg-white px-2 relative z-[99]">
-                            {barCategories.map(cat => (
-                                <Link key={cat._id} href={`/products?category=${cat._id}`}
-                                    className="flex items-center gap-1 shrink-0 px-3 py-1.5 rounded-[6px] text-[13.5px] font-medium text-[#222] hover:bg-black/[0.04] transition-colors whitespace-nowrap">
-                                    <span className="truncate max-w-[130px]">{cat.name}</span>
-                                    <FiChevronDown size={13} strokeWidth={2.5} className="text-gray-400 shrink-0" />
-                                </Link>
-                            ))}
+                            {/* Skeleton pills while loading; real categories when loaded;
+                                nothing when the API returns none — never fallback data. */}
+                            {categoriesLoading
+                                ? <CategoryPillSkeletonRow count={8} />
+                                : barCategories.map(cat => (
+                                    <Link key={cat._id} href={`/products?category=${cat._id}`}
+                                        className="flex items-center gap-1 shrink-0 px-3 py-1.5 rounded-[6px] text-[13.5px] font-medium text-[#222] hover:bg-black/[0.04] transition-colors whitespace-nowrap">
+                                        <span className="truncate max-w-[130px]">{cat.name}</span>
+                                        <FiChevronDown size={13} strokeWidth={2.5} className="text-gray-400 shrink-0" />
+                                    </Link>
+                                ))}
                         </nav>
                 </div>
             </div>

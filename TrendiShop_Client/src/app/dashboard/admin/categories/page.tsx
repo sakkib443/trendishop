@@ -3,7 +3,7 @@
 "use client";
 
 import React, { useState, useMemo } from 'react';
-import { LuPlus, LuPencil, LuTrash2, LuEye, LuEyeOff, LuLayoutGrid } from 'react-icons/lu';
+import { LuPlus, LuPencil, LuTrash2, LuEye, LuEyeOff, LuLayoutGrid, LuX } from 'react-icons/lu';
 import {
     useGetAdminCategoriesQuery,
     useDeleteCategoryMutation,
@@ -13,7 +13,7 @@ import {
 import { SingleImageUploader } from '@/components/ui/ImageUploader';
 import { toast } from 'react-hot-toast';
 import {
-    PageHeader, Btn, SearchInput, Segmented, FilterBar, Badge, TableCard, TH, TD, TR, EmptyRow, SkeletonRows,
+    PageHeader, Btn, SearchInput, SelectPill, Segmented, FilterBar, Badge, TableCard, TH, TD, TR, EmptyRow, SkeletonRows,
     RowMenu, Modal, Field, Toggle, INPUT, TEXTAREA, fmtDateTime, cx,
 } from '@/components/admin/ui';
 
@@ -82,6 +82,9 @@ export default function CategoriesPage() {
     const [form, setForm] = useState(EMPTY_FORM);
     /* per-field inline errors (mirrors backend errorMessages[].path → message) */
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+    /* bulk selection */
+    const [selected, setSelected] = useState<Set<string>>(new Set());
+    const [bulkStatus, setBulkStatus] = useState('');
 
     const categories: any[] = useMemo(() => categoriesData?.data || [], [categoriesData]);
     const isSaving = isCreating || isUpdating;
@@ -184,6 +187,41 @@ export default function CategoriesPage() {
         }
     };
 
+    // ── Bulk selection ──
+    const clearSelection = () => setSelected(new Set());
+    const toggleOne = (id: string) => setSelected((prev) => {
+        const next = new Set(prev);
+        if (next.has(id)) next.delete(id); else next.add(id);
+        return next;
+    });
+
+    const handleBulkStatus = async (val: string) => {
+        const ids = Array.from(selected);
+        if (!ids.length || !val) return;
+        const isActive = val === 'active';
+        const tId = toast.loading(`Updating ${ids.length} categor${ids.length > 1 ? 'ies' : 'y'}…`);
+        const results = await Promise.allSettled(ids.map((id) => updateCategory({ id, data: { isActive } }).unwrap()));
+        const ok = results.filter((r) => r.status === 'fulfilled').length;
+        const failed = results.length - ok;
+        if (ok > 0) toast.success(`${isActive ? 'Activated' : 'Hidden'} ${ok} categor${ok > 1 ? 'ies' : 'y'}${failed ? ` · ${failed} failed` : ''}`, { id: tId });
+        else toast.error('Could not update the selected categories', { id: tId });
+        clearSelection();
+        setBulkStatus('');
+    };
+
+    const handleBulkDelete = async () => {
+        const ids = Array.from(selected);
+        if (!ids.length) return;
+        if (!window.confirm(`Delete ${ids.length} categor${ids.length > 1 ? 'ies' : 'y'}?`)) return;
+        const tId = toast.loading(`Deleting ${ids.length} categor${ids.length > 1 ? 'ies' : 'y'}…`);
+        const results = await Promise.allSettled(ids.map((id) => deleteCategory(id).unwrap()));
+        const ok = results.filter((r) => r.status === 'fulfilled').length;
+        const failed = results.length - ok;
+        if (ok > 0) toast.success(`Deleted ${ok} categor${ok > 1 ? 'ies' : 'y'}${failed ? ` · ${failed} failed` : ''}`, { id: tId });
+        else toast.error('Could not delete the selected categories', { id: tId });
+        clearSelection();
+    };
+
     // Descendants of the category being edited — it cannot become its own ancestor.
     const descendantIdsOfEditing = useMemo(() => {
         if (!editingId) return new Set<string>();
@@ -250,25 +288,67 @@ export default function CategoriesPage() {
         return out;
     }, [categories, scope, searchTerm]);
 
+    // Select-all works over the rows currently visible (after scope + search).
+    const visibleIds = useMemo(() => orderedList.map(({ cat }) => cat._id as string), [orderedList]);
+    const allSelected = visibleIds.length > 0 && visibleIds.every((id) => selected.has(id));
+    const someSelected = selected.size > 0 && !allSelected;
+    const toggleAll = () => setSelected((prev) => {
+        const next = new Set(prev);
+        if (visibleIds.every((id) => next.has(id))) visibleIds.forEach((id) => next.delete(id));
+        else visibleIds.forEach((id) => next.add(id));
+        return next;
+    });
+
     return (
         <div>
             <PageHeader
                 title="Categories"
                 subtitle="Hierarchical product categories - a category can sit inside another."
                 actions={<>
-                    <Segmented value={scope} onChange={setScope} options={[{ value: 'active', label: 'Active' }, { value: 'all', label: 'All' }]} />
+                    <Segmented value={scope} onChange={(v) => { setScope(v); clearSelection(); }} options={[{ value: 'active', label: 'Active' }, { value: 'all', label: 'All' }]} />
                     <Btn variant="primary" icon={<LuPlus size={16} />} onClick={openCreate}>Add category</Btn>
                 </>}
             />
 
             <FilterBar>
-                <SearchInput value={searchTerm} onChange={setSearchTerm} placeholder="Search categories…" />
+                <SearchInput value={searchTerm} onChange={(v) => { setSearchTerm(v); clearSelection(); }} placeholder="Search categories…" />
             </FilterBar>
+
+            {/* Bulk action bar */}
+            {selected.size > 0 && (
+                <div className="mb-4 flex flex-col gap-3 rounded-2xl border border-[var(--color-primary-border)] bg-[var(--color-primary-lightest)] px-4 py-3 sm:flex-row sm:items-center">
+                    <p className="text-sm font-medium text-gray-800">
+                        <span className="mr-2 inline-flex h-6 min-w-6 items-center justify-center rounded-full bg-[var(--color-primary)] px-2 text-xs text-white">{selected.size}</span>
+                        categor{selected.size > 1 ? 'ies' : 'y'} selected
+                    </p>
+                    <div className="flex flex-wrap items-center gap-2 sm:ml-auto">
+                        <SelectPill
+                            ariaLabel="Change status"
+                            className="w-48"
+                            value={bulkStatus}
+                            onChange={handleBulkStatus}
+                            options={[{ value: '', label: 'Change status to…' }, { value: 'active', label: 'Active' }, { value: 'hidden', label: 'Hidden' }]}
+                        />
+                        <Btn variant="danger" icon={<LuTrash2 size={15} />} onClick={handleBulkDelete}>Delete</Btn>
+                        <Btn variant="ghost" icon={<LuX size={15} />} onClick={clearSelection}>Clear</Btn>
+                    </div>
+                </div>
+            )}
 
             <TableCard footer={<p className="mt-4 text-sm text-gray-500">{orderedList.length} {orderedList.length === 1 ? 'category' : 'categories'}</p>}>
                 <table className="w-full">
                     <thead>
                         <tr>
+                            <th className={`${TH} w-10`}>
+                                <input
+                                    type="checkbox"
+                                    aria-label="Select all categories"
+                                    ref={(el) => { if (el) el.indeterminate = someSelected; }}
+                                    checked={allSelected}
+                                    onChange={toggleAll}
+                                    className="h-4 w-4 cursor-pointer rounded border-gray-300 accent-[var(--color-primary)]"
+                                />
+                            </th>
                             <th className={`${TH} w-12`}>#</th>
                             <th className={TH}>Name</th>
                             <th className={TH}>Slug</th>
@@ -279,12 +359,21 @@ export default function CategoriesPage() {
                         </tr>
                     </thead>
                     <tbody>
-                        {isLoading ? <SkeletonRows cols={7} rows={4} /> : orderedList.length === 0 ? (
-                            <EmptyRow colSpan={7}>
+                        {isLoading ? <SkeletonRows cols={8} rows={4} /> : orderedList.length === 0 ? (
+                            <EmptyRow colSpan={8}>
                                 {searchTerm ? 'No categories match your search.' : scope === 'active' ? 'No active categories.' : 'No categories yet.'}
                             </EmptyRow>
                         ) : orderedList.map(({ cat, depth }, i) => (
-                            <tr key={cat._id} className={TR}>
+                            <tr key={cat._id} className={cx(TR, selected.has(cat._id) && 'bg-[var(--color-primary-lightest)] hover:bg-[var(--color-primary-lightest)]')}>
+                                <td className={TD}>
+                                    <input
+                                        type="checkbox"
+                                        aria-label={`Select ${cat.name}`}
+                                        checked={selected.has(cat._id)}
+                                        onChange={() => toggleOne(cat._id)}
+                                        className="h-4 w-4 cursor-pointer rounded border-gray-300 accent-[var(--color-primary)]"
+                                    />
+                                </td>
                                 <td className={`${TD} text-gray-400`}>{i + 1}</td>
                                 <td className={TD}>
                                     <div className="flex min-w-[220px] items-center gap-3" style={{ paddingLeft: depth * 22 }}>
