@@ -393,8 +393,10 @@ const CartPage = () => {
     const freeThreshold = shipSettings?.freeShippingByThresholdEnabled ? (shipSettings?.freeShippingThreshold || 0) : 0;
     const remainingForFree = freeThreshold > 0 && !freeShipping ? Math.max(0, freeThreshold - selectedSubtotal) : 0;
 
-    // Total = (coupon ? finalAmount : selected subtotal) + estimated shipping
-    const baseAmount = appliedCoupon ? appliedCoupon.finalAmount : selectedSubtotal;
+    // Total = subtotal − coupon discount + estimated shipping.
+    // Compute from `discount` directly: the validate API doesn't return a
+    // finalAmount, so relying on it left the total showing the full subtotal.
+    const baseAmount = appliedCoupon ? Math.max(0, selectedSubtotal - appliedCoupon.discount) : selectedSubtotal;
     const finalTotal = baseAmount + shippingCost;
 
     const handleClearCart = () => {

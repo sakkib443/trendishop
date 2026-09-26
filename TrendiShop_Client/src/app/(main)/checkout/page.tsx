@@ -490,8 +490,10 @@ const CheckoutPage = () => {
 
     const isSubmitting = isPlacingOrder || isGuestPlacing || isInitiatingPayment;
 
-    // Total = (coupon ? finalAmount : subtotal) + shippingCost
-    const baseAmount = appliedCoupon ? appliedCoupon.finalAmount : totalPrice;
+    // Total = subtotal − coupon discount + shippingCost. Compute from `discount`
+    // directly: the validate API returns no finalAmount, so relying on it left
+    // the displayed total at the full subtotal even with a coupon applied.
+    const baseAmount = appliedCoupon ? Math.max(0, totalPrice - appliedCoupon.discount) : totalPrice;
     const orderTotal = baseAmount + shippingCost;
     const totalQuantity = items.reduce((a, i) => a + i.quantity, 0);
 
