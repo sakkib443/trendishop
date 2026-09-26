@@ -48,6 +48,12 @@ export default function ProductDetailsPage() {
     const [incrementStat] = useIncrementProductStatMutation();
     const [quantity, setQuantity] = useState(1);
     const [selectedImage, setSelectedImage] = useState(0);
+    // An uploaded image whose file is missing on the server (e.g. it was lost in a
+    // redeploy) would otherwise leave the gallery box blank — the card masks the
+    // same case with a placeholder, so mirror that here instead of showing nothing.
+    const [brokenImages, setBrokenImages] = useState<Set<string>>(new Set());
+    const markBroken = (src?: string) => { if (src) setBrokenImages(prev => (prev.has(src) ? prev : new Set(prev).add(src))); };
+    const safeSrc = (src?: string) => (src && !brokenImages.has(src)) ? src : PRODUCT_IMAGE_FALLBACK;
     const { isInWishlist, toggle: toggleWishlistItem } = useWishlist();
     const [addedToCart, setAddedToCart] = useState(false);
     const [isFullscreen, setIsFullscreen] = useState(false);
@@ -432,7 +438,8 @@ export default function ProductDetailsPage() {
                                     onMouseMove={(e) => { if (isDraggingRef.current && zoomLevel > 1) { hasDraggedRef.current = true; const o = { x: e.clientX - dragStartRef.current.x, y: e.clientY - dragStartRef.current.y }; panOffsetRef.current = o; setPanOffset({ ...o }); } }}
                                     onMouseUp={() => { isDraggingRef.current = false; }}
                                     onMouseLeave={() => { isDraggingRef.current = false; }}>
-                                    <img src={allImages[selectedImage] || allImages[0]} alt={product.name} draggable={false}
+                                    <img src={safeSrc(allImages[selectedImage] || allImages[0])} alt={product.name} draggable={false}
+                                        onError={(e) => { (e.target as HTMLImageElement).src = PRODUCT_IMAGE_FALLBACK; }}
                                         style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '6px', transition: 'transform 0.1s ease', transform: `translate(${panOffset.x}px, ${panOffset.y}px) scale(${zoomLevel})`, cursor: zoomLevel > 1 ? 'grab' : 'zoom-in', background: '#111', userSelect: 'none', transformOrigin: 'center center' }}
                                         onClick={(e) => { if (hasDraggedRef.current) { hasDraggedRef.current = false; return; } e.stopPropagation(); if (zoomLevel > 1) { setZoomLevel(1); const r = { x: 0, y: 0 }; panOffsetRef.current = r; setPanOffset(r); } else { setZoomLevel(1.8); } }}
                                         onWheel={(e) => { e.stopPropagation(); setZoomLevel(prev => { const n = Math.max(1, Math.min(2.5, prev + (e.deltaY < 0 ? 0.15 : -0.15))); if (n <= 1) { const r = { x: 0, y: 0 }; panOffsetRef.current = r; setPanOffset(r); } return n; }); }}
@@ -479,10 +486,11 @@ export default function ProductDetailsPage() {
                                     {/* The gallery's main image — the heaviest thing on this page.
                                         Its box is already `position: relative`, so `fill` leaves the
                                         layout alone while Next serves it at display size. */}
-                                    <Image src={allImages[selectedImage] || allImages[0] || PRODUCT_IMAGE_FALLBACK} alt={product.name}
+                                    <Image src={safeSrc(allImages[selectedImage] || allImages[0])} alt={product.name}
                                         fill
                                         sizes="(max-width: 768px) 100vw, 520px"
                                         style={{ objectFit: 'cover', transition: 'transform 0.3s ease' }}
+                                        onError={() => markBroken(allImages[selectedImage] || allImages[0])}
                                     />
                                     <div style={{ position: 'absolute', bottom: '10px', right: '10px', background: 'var(--color-primary)', borderRadius: '50%', padding: '7px', color: '#fff', opacity: 0, transition: 'opacity 0.3s' }} className="zoom-indicator">
                                         <FiZoomIn size={16} />
@@ -513,7 +521,7 @@ export default function ProductDetailsPage() {
                                     {allImages.map((img: string, idx: number) => (
                                         <button key={idx} onClick={() => handleImageSelect(idx)} onMouseEnter={() => handleImageSelect(idx)}
                                             style={{ width: '60px', height: '60px', flexShrink: 0, border: selectedImage === idx ? '2px solid var(--color-primary)' : '2px solid #e5e7eb', borderRadius: '6px', cursor: 'pointer', transition: 'all 0.2s ease', overflow: 'hidden', padding: 0, background: '#f5f5f5', boxShadow: selectedImage === idx ? '0 0 0 2px rgba(var(--color-primary-rgb), 0.15)' : 'none' }}>
-                                            <Image src={img} alt={`Product ${idx + 1}`} width={60} height={60} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                            <Image src={safeSrc(img)} alt={`Product ${idx + 1}`} width={60} height={60} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={() => markBroken(img)} />
                                         </button>
                                     ))}
                                 </div>
@@ -710,11 +718,11 @@ export default function ProductDetailsPage() {
                                         <p style={{ fontSize: '12px', fontWeight: 600, color: '#111', margin: '0 0 4px' }}>Delivery Charge</p>
                                         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: '#444', lineHeight: 1.6 }}>
                                             <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><FiMapPin size={11} style={{ color: '#9ca3af' }} /> Inside Dhaka</span>
-                                            <strong style={{ color: '#111' }}>৳{shipSettings?.defaultInsideDhakaRate ?? 70}</strong>
+                                            <strong style={{ color: '#111' }}>৳{Number(product.shippingConfig?.insideDhaka) > 0 ? Number(product.shippingConfig?.insideDhaka) : (shipSettings?.defaultInsideDhakaRate ?? 70)}</strong>
                                         </div>
                                         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: '#444', lineHeight: 1.6 }}>
                                             <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><FiMapPin size={11} style={{ color: '#9ca3af' }} /> Outside Dhaka</span>
-                                            <strong style={{ color: '#111' }}>৳{shipSettings?.defaultOutsideDhakaRate ?? 130}</strong>
+                                            <strong style={{ color: '#111' }}>৳{Number(product.shippingConfig?.outsideDhaka) > 0 ? Number(product.shippingConfig?.outsideDhaka) : (shipSettings?.defaultOutsideDhakaRate ?? 130)}</strong>
                                         </div>
                                         <p style={{ fontSize: '11px', color: '#9ca3af', margin: '3px 0 0' }}>
                                             Delivery in {shipSettings?.defaultEstimatedDays || '3-5 days'}

@@ -90,10 +90,15 @@ const productSchema = new Schema(
         },
 
         // ── Per-product shipping config ───────────────────────────
+        // insideDhaka / outsideDhaka: per-product delivery charge for each area.
+        // When > 0 they OVERRIDE the global flat rate for that product; 0/unset
+        // falls back to the global Inside / Outside Dhaka rate.
         shippingConfig: {
             freeShipping:  { type: Boolean, default: false },
             shippingCost:  { type: Number, default: 0 },
             estimatedDays: { type: Number, default: 3 },
+            insideDhaka:   { type: Number, default: 0 },
+            outsideDhaka:  { type: Number, default: 0 },
         },
 
         // ── Variants ──────────────────────────────────────────────

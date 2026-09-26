@@ -8,8 +8,10 @@ export type FreeReason = 'product' | 'coupon' | 'threshold' | 'quantity' | null;
 export interface ShippingQuoteInput {
     city?: string;
     subtotal?: number;
-    // Per-item free-delivery flags (from Product.shippingConfig.freeShipping).
-    items?: { freeShipping?: boolean }[];
+    // Per-item shipping fields (from Product.shippingConfig): the free-delivery
+    // flag plus the optional per-product Inside / Outside Dhaka charges. When an
+    // item's per-area charge is > 0 it overrides the global flat rate for that item.
+    items?: { freeShipping?: boolean; insideDhaka?: number; outsideDhaka?: number }[];
     // Total item quantity in the cart/order (for quantity-based free shipping).
     totalQuantity?: number;
     // Resolved upstream from a free_shipping coupon.
@@ -121,10 +123,23 @@ export async function computeShippingCost(
     // 4) Quantity threshold.
     if (qtyEnabled && minItems > 0 && Number(totalQuantity || 0) >= minItems) return free('quantity');
 
-    // 5a) Delivery area picked at checkout → the flat Inside / Outside Dhaka charge.
+    // 5a) Delivery area picked at checkout → per-product delivery charge.
+    //     The global flat rate is the baseline; each item may override it with its
+    //     own charge for the chosen area (> 0). For a multi-item cart the order pays
+    //     the MAX effective charge across items. No items → the global flat rate.
     if (isDeliveryArea(area)) {
+        const globalAreaRate = area === 'inside_dhaka' ? insideRate : outsideRate;
+        let shippingCost = globalAreaRate;
+        if (Array.isArray(items) && items.length > 0) {
+            shippingCost = Math.max(
+                ...items.map((it) => {
+                    const perProduct = Number(area === 'inside_dhaka' ? it?.insideDhaka : it?.outsideDhaka) || 0;
+                    return perProduct > 0 ? perProduct : globalAreaRate;
+                }),
+            );
+        }
         return {
-            shippingCost: area === 'inside_dhaka' ? insideRate : outsideRate,
+            shippingCost,
             estimatedDays: defaultDays,
             freeShipping: false,
             freeReason: null,

@@ -115,7 +115,7 @@ const ProductFormInner = ({ productId: propProductId }: { productId?: string }) 
         weight: '',
         dimensions: { length: '', width: '', height: '' },
         // Shipping & Warranty
-        shippingConfig: { freeShipping: false, shippingCost: 0, estimatedDays: 3 },
+        shippingConfig: { freeShipping: false, shippingCost: 0, estimatedDays: 3, insideDhaka: 0, outsideDhaka: 0 },
         warranty: { hasWarranty: false, duration: 0, durationUnit: 'months', type: 'manufacturer' },
         // SEO
         metaTitle: '', metaDescription: '', metaKeywords: [],
@@ -434,6 +434,8 @@ const ProductFormInner = ({ productId: propProductId }: { productId?: string }) 
                 freeShipping: Boolean(formData.shippingConfig?.freeShipping),
                 shippingCost: toOptionalNum(formData.shippingConfig?.shippingCost) ?? 0,
                 estimatedDays: toOptionalNum(formData.shippingConfig?.estimatedDays) ?? 3,
+                insideDhaka: toOptionalNum(formData.shippingConfig?.insideDhaka) ?? 0,
+                outsideDhaka: toOptionalNum(formData.shippingConfig?.outsideDhaka) ?? 0,
             };
 
             if (formData.warranty) {
@@ -1218,6 +1220,15 @@ const ProductFormInner = ({ productId: propProductId }: { productId?: string }) 
                                         <label className="text-[10px] font-bold text-gray-400">Est. Days</label>
                                         <input type="number" name="shippingConfig.estimatedDays" placeholder="3" className="w-full px-3 py-2 bg-white border border-gray-200 rounded-md text-sm outline-none focus:border-emerald-300" value={formData.shippingConfig.estimatedDays} onChange={handleChange} />
                                     </div>
+                                    <div className="space-y-1">
+                                        <label className="text-[10px] font-bold text-gray-400">Delivery charge — Inside Dhaka (৳)</label>
+                                        <input type="number" name="shippingConfig.insideDhaka" placeholder="0" className="w-full px-3 py-2 bg-white border border-gray-200 rounded-md text-sm outline-none focus:border-emerald-300" value={formData.shippingConfig.insideDhaka} onChange={handleChange} />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <label className="text-[10px] font-bold text-gray-400">Delivery charge — Outside Dhaka (৳)</label>
+                                        <input type="number" name="shippingConfig.outsideDhaka" placeholder="0" className="w-full px-3 py-2 bg-white border border-gray-200 rounded-md text-sm outline-none focus:border-emerald-300" value={formData.shippingConfig.outsideDhaka} onChange={handleChange} />
+                                    </div>
+                                    <p className="col-span-2 text-[10px] text-gray-400 leading-snug">Leave at 0 to use the store's global Inside / Outside Dhaka rate. When set, these override the global rate for this product.</p>
                                 </div>
                             )}
                         </div>

@@ -66,6 +66,8 @@ const productCreateShape = z.object({
         freeShipping:  z.boolean().optional(),
         shippingCost:  z.coerce.number().min(0).optional(),
         estimatedDays: z.coerce.number().min(0).optional(),
+        insideDhaka:   z.coerce.number().min(0).optional(),
+        outsideDhaka:  z.coerce.number().min(0).optional(),
     }).optional(),
 
     // Status

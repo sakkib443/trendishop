@@ -245,11 +245,17 @@ function editBlockedReason(order: any): string | null {
  * The `freeShipping` flag per line, which the delivery-charge rules need. An edit that
  * restaged its lines already holds the products, so they are not read a second time.
  */
-async function freeShippingFlags(items: any[], staged: { product: any }[]): Promise<{ freeShipping: boolean }[]> {
-    if (staged.length) return staged.map((s) => ({ freeShipping: Boolean(s.product?.shippingConfig?.freeShipping) }));
+type ShippingItemFlags = { freeShipping: boolean; insideDhaka: number; outsideDhaka: number };
+const shippingItemFlags = (cfg: any): ShippingItemFlags => ({
+    freeShipping: Boolean(cfg?.freeShipping),
+    insideDhaka: Number(cfg?.insideDhaka) || 0,
+    outsideDhaka: Number(cfg?.outsideDhaka) || 0,
+});
+async function freeShippingFlags(items: any[], staged: { product: any }[]): Promise<ShippingItemFlags[]> {
+    if (staged.length) return staged.map((s) => shippingItemFlags(s.product?.shippingConfig));
     const products = await Product.find({ _id: { $in: items.map((it) => it.product) } }).select('shippingConfig').lean();
-    const byId = new Map(products.map((p: any) => [String(p._id), Boolean(p.shippingConfig?.freeShipping)]));
-    return items.map((it) => ({ freeShipping: byId.get(String(it.product)) || false }));
+    const byId = new Map(products.map((p: any) => [String(p._id), shippingItemFlags(p.shippingConfig)]));
+    return items.map((it) => byId.get(String(it.product)) || shippingItemFlags(null));
 }
 
 /** How an order line is matched against the same line in an edit: product + colour + size. */
@@ -455,7 +461,11 @@ const OrderService = {
             const quote = await computeShippingCost({
                 city: shippingAddress?.city || '',
                 subtotal,
-                items: stagedItems.map((s: any) => ({ freeShipping: Boolean(s.product?.shippingConfig?.freeShipping) })),
+                items: stagedItems.map((s: any) => ({
+                    freeShipping: Boolean(s.product?.shippingConfig?.freeShipping),
+                    insideDhaka: Number(s.product?.shippingConfig?.insideDhaka) || 0,
+                    outsideDhaka: Number(s.product?.shippingConfig?.outsideDhaka) || 0,
+                })),
                 totalQuantity: orderItems.reduce((n: number, oi: any) => n + (oi.quantity || 0), 0),
                 couponFreeShipping,
                 zoneId,
