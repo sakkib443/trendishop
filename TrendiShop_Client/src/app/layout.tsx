@@ -34,9 +34,9 @@ export async function generateMetadata(): Promise<Metadata> {
     keywords: keywords.length ? keywords : DEFAULT_KEYWORDS,
     applicationName: "TrendiShop",
     icons: {
-      icon: "/logo-mark.svg",
-      shortcut: "/logo-mark.svg",
-      apple: "/logo-mark.svg",
+      icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
+      shortcut: "/favicon.svg",
+      apple: "/favicon.svg",
     },
     alternates: { canonical: "/" },
     openGraph: {
