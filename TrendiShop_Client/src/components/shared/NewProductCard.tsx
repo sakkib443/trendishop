@@ -197,7 +197,7 @@ const NewProductCard: React.FC<NewProductCardProps> = ({ product }) => {
                         alt={product.name}
                         fill
                         sizes='(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 260px'
-                        className='object-cover transition-transform duration-500 group-hover:scale-[1.06]'
+                        className='object-contain transition-transform duration-500 group-hover:scale-[1.06]'
                         onError={() => setImageFailed(true)}
                     />
                 </span>

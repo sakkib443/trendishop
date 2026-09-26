@@ -1392,20 +1392,11 @@ h6 {
   display: block;
   aspect-ratio: 1 / 1;
   overflow: hidden;
-  /* The photo now fills the well edge-to-edge (object-cover), so this canvas
-     only peeks through where a transparent PNG leaves gaps. A soft diagonal
-     wash — hazier than a flat block — lets those areas melt into the card
-     instead of showing a hard grey plate behind the product. */
-  background: linear-gradient(135deg, #f5f7fa 0%, #eef1f5 55%, #e9edf2 100%);
-  /* Round the top a touch tighter than the card's own 24px so the picture's
-     corners sit cleanly inside the card outline. */
-  border-radius: var(--pc-radius, 21px) var(--pc-radius, 21px) 0 0;
+  background: #ffffff;
 }
 
 .pc-pic-inner {
   position: absolute;
-  /* Full width and flush to the top — the photo fills the well edge-to-edge so
-     it reads big; only the bottom stops at the shelf/notch. */
   inset: 0 0 var(--pc-notch-h) 0;
   display: block;
 }
