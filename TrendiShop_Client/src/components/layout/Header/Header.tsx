@@ -45,8 +45,8 @@ const FALLBACK_CATEGORIES: Category[] = [
 /** Row 2 — the four quick links that sit between the logo and the search field. */
 const PRIMARY_LINKS: { href: string; label: string; highlight?: boolean }[] = [
     { href: '/shop', label: 'Shop' },
-    { href: '/services', label: 'Services' },
     { href: '/products?sort=discount', label: 'Offer', highlight: true },
+    { href: '/services', label: 'Services' },
     { href: '/ship-for-me', label: 'Ship For Me' },
     { href: '/quotations', label: 'Request Product' },
 ];
@@ -214,6 +214,22 @@ const Header: React.FC = () => {
     return (
         <header className="dz-header w-full sticky top-0 z-[60] lg:static bg-white lg:px-4 transition-colors duration-300">
 
+            {/* Twinkling star on the "Offer" nav pill. Kept inline so it ships with
+                the component regardless of the global CSS pipeline. */}
+            <style dangerouslySetInnerHTML={{ __html: `
+                .offer-star {
+                    position: absolute; top: -7px; right: -5px;
+                    font-size: 12px; line-height: 1; pointer-events: none;
+                    transform-origin: center;
+                    animation: offer-twinkle 1.4s ease-in-out infinite;
+                    text-shadow: 0 0 4px rgba(222,180,117,.95), 0 0 9px rgba(203,132,59,.75);
+                }
+                @keyframes offer-twinkle {
+                    0%, 100% { opacity: 1; transform: scale(1) rotate(0deg); }
+                    50% { opacity: .35; transform: scale(.65) rotate(45deg); }
+                }
+            ` }} />
+
             {/* Rows 1–3 share the charcoal backdrop; the ticker below sits on white. */}
             <div className="dz-header-bg">
 
@@ -262,11 +278,14 @@ const Header: React.FC = () => {
                         <nav className="hidden lg:flex items-center gap-1 shrink-0">
                             {PRIMARY_LINKS.map(l => (
                                 <Link key={l.href} href={l.href}
-                                    className={`text-sm px-3 py-1.5 rounded-[6px] transition-colors font-medium whitespace-nowrap ${l.highlight ? 'border text-white' : 'text-gray-300 hover:text-white hover:bg-white/5'}`}
+                                    className={`relative text-sm px-3 py-1.5 rounded-[6px] transition-colors font-medium whitespace-nowrap ${l.highlight ? 'border text-white' : 'text-gray-300 hover:text-white hover:bg-white/5'}`}
                                     style={l.highlight
                                         ? { borderColor: 'var(--hd-gold-line)', background: 'var(--hd-gold-soft)' }
                                         : undefined}>
                                     {l.label}
+                                    {l.highlight && (
+                                        <span aria-hidden className="offer-star" style={{ color: 'var(--hd-gold)' }}>★</span>
+                                    )}
                                 </Link>
                             ))}
                         </nav>
