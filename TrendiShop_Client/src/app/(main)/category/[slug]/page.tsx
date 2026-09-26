@@ -5,8 +5,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     const { slug } = await params;
     const pretty = slug.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
     return {
-        title: `${pretty} — Trendy Shops`,
-        description: `Shop ${pretty} on Trendy Shops. Browse products, filter by price, rating and availability, sorted by best match.`,
+        title: `${pretty} — TrendiShop`,
+        description: `Shop ${pretty} on TrendiShop. Browse products, filter by price, rating and availability, sorted by best match.`,
         alternates: { canonical: `/category/${slug}` },
     };
 }

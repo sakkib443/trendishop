@@ -17,7 +17,7 @@ const productSchema = new mongoose.Schema(
 const Product = mongoose.model('Product', productSchema);
 
 // Curated, stable Unsplash photos that match each product.
-// Slug keys come from the seed (see trendyshops_server/src/scripts/seed.ts).
+// Slug keys come from the seed (see trendishop_server/src/scripts/seed.ts).
 const updates: { slug: string; thumbnail: string; images: string[] }[] = [
     {
         slug: 'silk-blend-saree',

@@ -237,13 +237,13 @@ const AnalyticsController = {
             const pdf = await AnalyticsService.generateSalesReportPdf(period);
             const name = period.from === period.to ? period.from : `${period.from}_to_${period.to}`;
             res.setHeader('Content-Type', 'application/pdf');
-            res.setHeader('Content-Disposition', `attachment; filename="TrendyShops-Sales-Report-${name}.pdf"`);
+            res.setHeader('Content-Disposition', `attachment; filename="TrendiShop-Sales-Report-${name}.pdf"`);
             res.send(pdf);
             return;
         }
         const pdf = await AnalyticsService.generateAdminReportPdf();
         res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', `attachment; filename="TrendyShops-Platform-Analytics.pdf"`);
+        res.setHeader('Content-Disposition', `attachment; filename="TrendiShop-Platform-Analytics.pdf"`);
         res.send(pdf);
     }),
 };

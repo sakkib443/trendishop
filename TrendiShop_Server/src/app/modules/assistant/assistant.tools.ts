@@ -1,5 +1,5 @@
 /**
- * Tools the TrendyBot assistant can call to read REAL Trendy Shops data (products,
+ * Tools the TrendyBot assistant can call to read REAL TrendiShop data (products,
  * categories, order tracking, store/contact/policy info). The model decides when
  * to call these; results are fed back so answers are grounded in live data.
  * Everything here is read-only and only returns non-sensitive, public info.
@@ -18,7 +18,7 @@ export const TOOL_DEFS = [
         function: {
             name: 'search_products',
             description:
-                'Search Trendy Shops products by keyword (name, brand, tag, or description). Use this whenever the user asks what products exist, prices, availability/stock, recommendations, or links to buy. Returns real, in-catalog products only.',
+                'Search TrendiShop products by keyword (name, brand, tag, or description). Use this whenever the user asks what products exist, prices, availability/stock, recommendations, or links to buy. Returns real, in-catalog products only.',
             parameters: {
                 type: 'object',
                 properties: {
@@ -32,7 +32,7 @@ export const TOOL_DEFS = [
         type: 'function',
         function: {
             name: 'list_categories',
-            description: 'List Trendy Shops product categories (with links). Use when the user asks what kinds of products or categories are available.',
+            description: 'List TrendiShop product categories (with links). Use when the user asks what kinds of products or categories are available.',
             parameters: { type: 'object', properties: {} },
         },
     },
@@ -52,7 +52,7 @@ export const TOOL_DEFS = [
         type: 'function',
         function: {
             name: 'get_store_info',
-            description: 'Get Trendy Shops contact details, accepted payment methods, delivery info, and policy pages (terms / privacy / refund). Use for how-to-pay, contact, delivery, and returns/refund policy questions.',
+            description: 'Get TrendiShop contact details, accepted payment methods, delivery info, and policy pages (terms / privacy / refund). Use for how-to-pay, contact, delivery, and returns/refund policy questions.',
             parameters: { type: 'object', properties: {} },
         },
     },
@@ -129,7 +129,7 @@ export const AssistantTools: Record<string, (args: any) => Promise<any>> = {
             paymentMethods: methods,
             cashOnDelivery: true,
             paymentInstructions: pay.instructions || '',
-            delivery: 'Trendy Shops delivers across Bangladesh. Inside Dhaka usually 1-3 days, outside Dhaka 3-5 days. Cash on Delivery is available.',
+            delivery: 'TrendiShop delivers across Bangladesh. Inside Dhaka usually 1-3 days, outside Dhaka 3-5 days. Cash on Delivery is available.',
             policies: (sc.legalPages || [])
                 .filter((p: any) => p.active)
                 .map((p: any) => ({ slug: p.slug, title: p.title, summary: String(p.content || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 1200), link: `/${p.slug}` })),

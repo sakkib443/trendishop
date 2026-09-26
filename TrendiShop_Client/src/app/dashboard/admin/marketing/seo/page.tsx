@@ -16,11 +16,11 @@ export default function SeoPage() {
                         group="seo"
                         showStatus={false}
                         title="Home page"
-                        description="The home page uses these as they are; other pages show their own name followed by “| Trendy Shops”."
+                        description="The home page uses these as they are; other pages show their own name followed by “| TrendiShop”."
                         fields={[
                             {
                                 key: 'title', label: 'Title', required: true, maxLength: 60,
-                                placeholder: 'Trendy Shops — Kitchenware online in Bangladesh',
+                                placeholder: 'TrendiShop — Kitchenware online in Bangladesh',
                                 hint: 'The blue link in Google results. Around 50–60 characters shows in full.',
                             },
                             {

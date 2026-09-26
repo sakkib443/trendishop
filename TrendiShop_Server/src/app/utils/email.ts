@@ -2,7 +2,7 @@ import nodemailer from 'nodemailer';
 import config from '../config';
 
 /**
- * Email infrastructure for Trendy Shops.
+ * Email infrastructure for TrendiShop.
  *
  * In production, set EMAIL_HOST / EMAIL_USER / EMAIL_PASS (and optionally
  * EMAIL_PORT / EMAIL_FROM) and a real SMTP transporter is used.

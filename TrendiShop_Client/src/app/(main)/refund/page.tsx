@@ -4,7 +4,7 @@ import LegalPageLayout from '@/components/shared/LegalPageLayout';
 
 export const metadata: Metadata = {
     title: "Refund & Return Policy",
-    description: "Understand Trendy Shops's refund and return policy — how to request a refund, eligibility, and timelines for orders in Bangladesh.",
+    description: "Understand TrendiShop's refund and return policy — how to request a refund, eligibility, and timelines for orders in Bangladesh.",
     alternates: { canonical: "/refund" },
 };
 

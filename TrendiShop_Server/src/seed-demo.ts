@@ -1,5 +1,5 @@
 /**
- * Trendy Shops — small demo seed: 5 categories + 5 products with real photos.
+ * TrendiShop — small demo seed: 5 categories + 5 products with real photos.
  *
  * Images are hosted on images.unsplash.com, which is already whitelisted in the
  * client's next.config.ts remotePatterns.

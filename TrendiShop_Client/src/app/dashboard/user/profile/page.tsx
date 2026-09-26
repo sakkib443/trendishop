@@ -206,7 +206,7 @@ export default function ProfilePage() {
             {/* ── Sign-in & Security ── */}
             <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
                 <h2 className="text-base font-bold text-gray-800 mb-1 flex items-center gap-2"><FiShield size={17} className="text-[var(--color-primary)]" /> Sign-in & Security</h2>
-                <p className="text-xs text-gray-400 mb-5">How you sign in to your Trendy Shops account</p>
+                <p className="text-xs text-gray-400 mb-5">How you sign in to your TrendiShop account</p>
 
                 {/* Current method */}
                 <div className="flex items-center justify-between py-3 px-4 rounded-xl bg-gray-50 border border-gray-100">

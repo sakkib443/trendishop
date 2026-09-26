@@ -4,7 +4,7 @@ import LegalPageLayout from '@/components/shared/LegalPageLayout';
 
 export const metadata: Metadata = {
     title: "Terms & Conditions",
-    description: "Read the Terms & Conditions for using Trendy Shops's online marketplace and shopping services in Bangladesh.",
+    description: "Read the Terms & Conditions for using TrendiShop's online marketplace and shopping services in Bangladesh.",
     alternates: { canonical: "/terms" },
 };
 

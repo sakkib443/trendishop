@@ -21,7 +21,7 @@ import Link from 'next/link';
 import { toast } from 'react-hot-toast';
 import { trackBeginCheckout, trackPurchase } from '@/lib/marketing';
 
-const COUPON_STORAGE_KEY = 'trendyshops_applied_coupon';
+const COUPON_STORAGE_KEY = 'trendishop_applied_coupon';
 
 // ─── Payment methods offered ──────────────────────────────────────────────
 // Cash on Delivery always. bKash, Nagad, Rocket and bank transfer only while the super admin
@@ -78,7 +78,7 @@ const CheckoutPage = () => {
     // Honor the cart's selection: only the ticked items are checked out (falls back to all).
     const items = React.useMemo(() => {
         try {
-            const sel = JSON.parse(localStorage.getItem('trendyshops_selected_cart') || 'null');
+            const sel = JSON.parse(localStorage.getItem('trendishop_selected_cart') || 'null');
             if (Array.isArray(sel) && sel.length > 0) {
                 const filtered = allCartItems.filter((i: any) => sel.includes(i.id));
                 if (filtered.length > 0) return filtered;
@@ -411,7 +411,7 @@ const CheckoutPage = () => {
                 const result = await createOrder(orderPayload).unwrap();
                 reportPurchase(result?.data?.order || result?.data);
                 items.forEach((i: any) => dispatch(removeFromCart(i.id)));
-                try { localStorage.removeItem('trendyshops_selected_cart'); } catch {}
+                try { localStorage.removeItem('trendishop_selected_cart'); } catch {}
                 localStorage.removeItem(COUPON_STORAGE_KEY);
                 await persistAddressIfNeeded();
 
@@ -429,7 +429,7 @@ const CheckoutPage = () => {
                 const result = await guestCheckout(orderPayload).unwrap();
                 reportPurchase(result?.data?.order || result?.data);
                 items.forEach((i: any) => dispatch(removeFromCart(i.id)));
-                try { localStorage.removeItem('trendyshops_selected_cart'); } catch {}
+                try { localStorage.removeItem('trendishop_selected_cart'); } catch {}
                 localStorage.removeItem(COUPON_STORAGE_KEY);
 
                 if (result.data?.accessToken && result.data?.user) {

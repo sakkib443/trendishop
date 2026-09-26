@@ -6,7 +6,7 @@ import { z } from 'zod';
  * Tracking IDs are interpolated into <script> tags on every storefront page, so each
  * one must match a strict pattern: letters, digits and a fixed prefix, nothing that
  * could close a string or a tag. The client mirrors these patterns
- * (ShohozKitchen_Client/src/lib/marketing.ts) and refuses to render anything else.
+ * (TrendiShop_Client/src/lib/marketing.ts) and refuses to render anything else.
  */
 export const MARKETING_PATTERNS = {
     gtmId: /^GTM-[A-Z0-9]{4,12}$/,

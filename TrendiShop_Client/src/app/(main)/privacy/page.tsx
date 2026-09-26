@@ -4,7 +4,7 @@ import LegalPageLayout from '@/components/shared/LegalPageLayout';
 
 export const metadata: Metadata = {
     title: "Privacy Policy",
-    description: "Learn how Trendy Shops collects, uses, and protects your personal data when you use our online marketplace.",
+    description: "Learn how TrendiShop collects, uses, and protects your personal data when you use our online marketplace.",
     alternates: { canonical: "/privacy" },
 };
 

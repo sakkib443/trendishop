@@ -158,7 +158,7 @@ export default function NotFound() {
 
             {/* Footer */}
             <footer className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 py-6 text-center text-xs text-slate-400 border-t border-slate-900">
-                <p>&copy; {new Date().getFullYear()} Trendy Shops. All rights reserved.</p>
+                <p>&copy; {new Date().getFullYear()} TrendiShop. All rights reserved.</p>
             </footer>
         </div>
     );

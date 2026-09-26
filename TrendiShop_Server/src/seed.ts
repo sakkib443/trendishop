@@ -1,10 +1,10 @@
 /**
- * Trendy Shops demo seed — creates realistic data to see the platform "in action".
+ * TrendiShop demo seed — creates realistic data to see the platform "in action".
  *
  *   Admin (1) · Products (live + pending moderation)
  *   Customers (10: 6 have ordered) · Orders across the full 11-state lifecycle + 3 payment methods.
  *
- * Idempotent: re-running first wipes any previous seed (anything on the @trendyshopsbd.com domain)
+ * Idempotent: re-running first wipes any previous seed (anything on the @trendishop.com domain)
  * so it never piles up duplicates. Real (non-seed) accounts are never touched.
  *
  * Run:  npx ts-node --transpile-only src/seed.ts
@@ -23,7 +23,7 @@ if (PASSWORD.length < 10) {
     console.error('Set SEED_PASSWORD in .env (at least 10 characters) before seeding.');
     process.exit(1);
 }
-const DOMAIN = '@trendyshopsbd.com';
+const DOMAIN = '@trendishop.com';
 const img = (seed: string) => `https://picsum.photos/seed/${seed}/600/600`;
 const daysAgo = (n: number) => new Date(Date.now() - n * 24 * 60 * 60 * 1000);
 
@@ -31,7 +31,7 @@ async function run() {
     await mongoose.connect(config.database_url);
     console.log('🔌 Connected to MongoDB\n');
 
-    // ── 1. WIPE PREVIOUS SEED (scoped to @trendyshopsbd.com only) ──────────────
+    // ── 1. WIPE PREVIOUS SEED (scoped to @trendishop.com only) ──────────────
     const prior = await User.find({ email: new RegExp(`${DOMAIN}$`, 'i') }).select('_id');
     const priorIds = prior.map((u) => u._id);
     if (priorIds.length) {
@@ -59,7 +59,7 @@ async function run() {
 
     // ── 3. ADMIN ───────────────────────────────────────────────────────────
     const admin = await User.create({
-        email: `admin${DOMAIN}`, password: PASSWORD, firstName: 'Trendy Shops', lastName: 'Admin',
+        email: `admin${DOMAIN}`, password: PASSWORD, firstName: 'TrendiShop', lastName: 'Admin',
         phone: '01700000000', role: 'admin', status: 'active', isEmailVerified: true,
     });
     console.log('👑 Admin created');

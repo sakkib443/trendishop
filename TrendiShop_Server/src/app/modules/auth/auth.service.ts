@@ -12,10 +12,10 @@ import { fetchWithTimeout } from '../../utils/fetchWithTimeout';
 const sha256 = (value: string): string => crypto.createHash('sha256').update(value).digest('hex');
 
 const buildVerificationEmail = (verifyLink: string): { subject: string; html: string } => ({
-    subject: 'Verify your Trendy Shops email',
+    subject: 'Verify your TrendiShop email',
     html: `
         <div style="font-family: Arial, sans-serif; max-width: 480px; margin: auto;">
-            <h2 style="color: #F85606;">Welcome to Trendy Shops!</h2>
+            <h2 style="color: #F85606;">Welcome to TrendiShop!</h2>
             <p>Please confirm your email address to activate your account.</p>
             <p style="text-align: center; margin: 28px 0;">
                 <a href="${verifyLink}" style="background: #F85606; color: #fff; padding: 12px 28px; border-radius: 6px; text-decoration: none; display: inline-block;">Verify Email</a>
@@ -26,7 +26,7 @@ const buildVerificationEmail = (verifyLink: string): { subject: string; html: st
 });
 
 const buildOtpEmail = (otp: string, purpose: string): { subject: string; html: string } => ({
-    subject: `Your Trendy Shops verification code: ${otp}`,
+    subject: `Your TrendiShop verification code: ${otp}`,
     html: `
         <div style="font-family: Arial, sans-serif; max-width: 480px; margin: auto;">
             <h2 style="color: #F85606;">Your verification code</h2>
@@ -37,7 +37,7 @@ const buildOtpEmail = (otp: string, purpose: string): { subject: string; html: s
 });
 
 const buildResetEmail = (resetLink: string): { subject: string; html: string } => ({
-    subject: 'Reset your Trendy Shops password',
+    subject: 'Reset your TrendiShop password',
     html: `
         <div style="font-family: Arial, sans-serif; max-width: 480px; margin: auto;">
             <h2 style="color: #F85606;">Password reset request</h2>
@@ -65,7 +65,7 @@ const AuthService = {
         const { firstName, lastName, email, phone, password, location } = payload;
 
         // Auto-generate guest email if only phone provided
-        const userEmail = email || `${phone?.replace(/\s+/g, '')}@guest.trendyshopsbd.com`;
+        const userEmail = email || `${phone?.replace(/\s+/g, '')}@guest.trendishop.com`;
 
         const isExists = await User.isUserExists(userEmail);
         if (isExists) throw new AppError(400, 'Account already exists with this email. Please login.');
@@ -234,7 +234,7 @@ const AuthService = {
             // server-to-server HTTPS call, so we can read its claims directly.
             payload = (jwt.decode(tokens.id_token) as any) || {};
             if (config.google.client_id && payload.aud !== config.google.client_id) {
-                throw new AppError(401, 'This Google sign-in is not authorized for Trendy Shops.');
+                throw new AppError(401, 'This Google sign-in is not authorized for TrendiShop.');
             }
         } else if (idToken) {
             // ID token: tokeninfo validates signature + expiry and returns the claims.
@@ -245,7 +245,7 @@ const AuthService = {
             }
             // Must be minted for OUR app (prevents token reuse from another Google app).
             if (config.google.client_id && payload.aud !== config.google.client_id) {
-                throw new AppError(401, 'This Google sign-in is not authorized for Trendy Shops.');
+                throw new AppError(401, 'This Google sign-in is not authorized for TrendiShop.');
             }
         } else if (accessToken) {
             // Access token: first confirm which app it was issued to (aud), then
@@ -256,7 +256,7 @@ const AuthService = {
                 throw new AppError(401, 'Could not verify your Google account. Please try again.');
             }
             if (config.google.client_id && ti.aud !== config.google.client_id) {
-                throw new AppError(401, 'This Google sign-in is not authorized for Trendy Shops.');
+                throw new AppError(401, 'This Google sign-in is not authorized for TrendiShop.');
             }
             const uiRes = await fetchWithTimeout('https://www.googleapis.com/oauth2/v3/userinfo', {
                 headers: { Authorization: `Bearer ${accessToken}` },

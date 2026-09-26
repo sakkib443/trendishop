@@ -100,7 +100,7 @@ const UserService = {
     // until the customer resets it.
     async createCustomer(payload: { firstName: string; lastName?: string; phone: string; email?: string; defaultDiscount?: number; loyaltyPoints?: number }) {
         const phone = payload.phone.replace(/\s+/g, '');
-        const email = (payload.email || `${phone}@guest.trendyshopsbd.com`).toLowerCase().trim();
+        const email = (payload.email || `${phone}@guest.trendishop.com`).toLowerCase().trim();
 
         const clash = await User.findOne({ $or: [{ phone }, { email }] }).select('_id phone email');
         if (clash) {

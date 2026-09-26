@@ -52,7 +52,7 @@ export default function AdminDashboard() {
         <div className="space-y-4">
             <PageHeader
                 title={name ? `Welcome back, ${name}` : 'Welcome back'}
-                subtitle={<>Here&apos;s an overview of Trendy Shops.{updated && <span className="text-gray-400"> Updated {updated}.</span>}</>}
+                subtitle={<>Here&apos;s an overview of TrendiShop.{updated && <span className="text-gray-400"> Updated {updated}.</span>}</>}
                 actions={
                     <>
                         <Btn

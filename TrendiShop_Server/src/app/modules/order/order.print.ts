@@ -37,7 +37,7 @@ const round2 = (n: number) => Math.round(n * 100) / 100;
 const same = (a: unknown, b: unknown) => text(a).toLowerCase() === text(b).toLowerCase();
 
 /** Placeholder emails created for guest / phone orders — never printed. */
-const isPlaceholderEmail = (email: string) => /@guest\.trendyshops\.com$/i.test(email);
+const isPlaceholderEmail = (email: string) => /@guest\.trendishop\.com$/i.test(email);
 
 /**
  * What has been paid and what is still owed — the same rule the admin Orders page

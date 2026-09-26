@@ -175,7 +175,7 @@ function Sidebar({ pathname, role, onClose, onLogout }: {
                 <Link href={homeFor(role)} className="flex items-center gap-2.5">
                     <Logo iconOnly size={34} />
                     <span className="leading-tight">
-                        <span className="block text-[15px] font-semibold text-gray-900">Trendy Shops</span>
+                        <span className="block text-[15px] font-semibold text-gray-900">TrendiShop</span>
                         <span className="block text-xs text-gray-500">Admin Dashboard</span>
                     </span>
                 </Link>

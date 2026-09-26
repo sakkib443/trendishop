@@ -682,7 +682,7 @@ const OrderService = {
         }
 
         // Auto-generate guest email from phone if not provided
-        const guestEmail = email || `${phone.replace(/\s+/g, '')}@guest.trendyshopsbd.com`;
+        const guestEmail = email || `${phone.replace(/\s+/g, '')}@guest.trendishop.com`;
 
         // Check if user already exists
         let user = await User.findOne({ $or: [{ email: guestEmail.toLowerCase() }, { phone }] });
@@ -773,7 +773,7 @@ const OrderService = {
         }
 
         if (!user) {
-            const placeholder = (String(email || '').trim() || `${phone}@guest.trendyshopsbd.com`).toLowerCase();
+            const placeholder = (String(email || '').trim() || `${phone}@guest.trendishop.com`).toLowerCase();
             if (await User.exists({ email: placeholder })) {
                 throw new AppError(409, 'A customer already uses this email — search for them by that email instead');
             }

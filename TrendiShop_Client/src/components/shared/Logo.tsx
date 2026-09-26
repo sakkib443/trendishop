@@ -1,7 +1,7 @@
 import React from 'react';
 
 /**
- * The Trendy Shops logo: a two-tone "Trendy Shops" wordmark with a small
+ * The TrendiShop logo: a two-tone "TrendiShop" wordmark with a small
  * raised BD, and a rounded-square TS monogram for tight spaces.
  *
  * Drawn as inline SVG rather than loaded as an image so it stays crisp at
@@ -58,7 +58,7 @@ const Logo: React.FC<LogoProps> = ({
     iconOnly = false,
     className,
 }) => {
-    // "Shops" stays brand-coloured on both grounds — that contrast against the
+    // "Shop" stays brand-coloured on both grounds — that contrast against the
     // first word is what makes the lockup read as a mark rather than as text.
     const wordFill = light ? '#ffffff' : INK;
     const bdFill = light ? '#ffffff' : BRAND;
@@ -69,7 +69,7 @@ const Logo: React.FC<LogoProps> = ({
             height={size}
             width={size}
             role="img"
-            aria-label="Trendy Shops"
+            aria-label="TrendiShop"
             style={{ display: 'block', maxWidth: '100%', height: 'auto' }}
         >
             <Mark light={light} />
@@ -80,7 +80,7 @@ const Logo: React.FC<LogoProps> = ({
             height={size}
             width={size * (LOCKUP_W / 48)}
             role="img"
-            aria-label="Trendy Shops BD"
+            aria-label="TrendiShop BD"
             style={{ display: 'block', maxWidth: '100%', height: 'auto' }}
         >
             {/* One <text> with tspans: the BD rides on the flow of the word
@@ -94,8 +94,8 @@ const Logo: React.FC<LogoProps> = ({
                 fontWeight={800}
                 letterSpacing="-0.7"
             >
-                <tspan fill={wordFill}>Trendy</tspan>
-                <tspan fill={BRAND}> Shops</tspan>
+                <tspan fill={wordFill}>Trendi</tspan>
+                <tspan fill={BRAND}>Shop</tspan>
                 <tspan
                     fill={bdFill}
                     fontSize="10"

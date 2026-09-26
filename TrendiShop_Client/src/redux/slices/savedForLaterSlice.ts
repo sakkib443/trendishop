@@ -8,7 +8,7 @@ interface SavedForLaterState {
     items: SavedItem[];
 }
 
-const STORAGE_KEY = 'trendyshops_saved';
+const STORAGE_KEY = 'trendishop_saved';
 
 // Load saved items from localStorage
 const loadSavedFromStorage = (): SavedForLaterState => {

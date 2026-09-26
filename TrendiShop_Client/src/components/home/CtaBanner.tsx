@@ -35,7 +35,7 @@ const CtaBanner: React.FC = () => {
 
                         {/* Copy */}
                         <div className="max-w-xl">
-                            <span className="cta-eyebrow"><i />Shop Trendy Shops</span>
+                            <span className="cta-eyebrow"><i />Shop TrendiShop</span>
                             <h2 className="cta-h mt-3">
                                 Every gadget you want,<br className="hidden sm:block" /> at a price that makes sense.
                             </h2>

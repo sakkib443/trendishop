@@ -3,18 +3,18 @@
  *
  * Runs an agentic tool-calling loop: Grok can call read-only tools (product
  * search, categories, order tracking, store info) to ground its answers in real
- * Trendy Shops data, then replies. General (non-store) questions are answered
+ * TrendiShop data, then replies. General (non-store) questions are answered
  * directly. The API key lives only in the server .env and is never exposed.
  */
 import config from '../../config';
 import { TOOL_DEFS, AssistantTools } from './assistant.tools';
 import { fetchWithTimeout } from '../../utils/fetchWithTimeout';
 
-const SYSTEM_PROMPT = `You are TrendyBot, the friendly and professional AI shopping assistant for Trendy Shops — an online kitchen store in Bangladesh. Currency is BDT (৳). Trendy Shops delivers across Bangladesh and offers Cash on Delivery.
+const SYSTEM_PROMPT = `You are TrendyBot, the friendly and professional AI shopping assistant for TrendiShop — an online kitchen store in Bangladesh. Currency is BDT (৳). TrendiShop delivers across Bangladesh and offers Cash on Delivery.
 
 HOW TO ANSWER:
 - For anything about the store — products, prices, stock/availability, recommendations, categories, how to order, delivery, payment methods, tracking an order, returns/refunds, or contact info — CALL the appropriate tool and answer from the REAL data it returns. Never invent product names, prices, stock, order status, or policies. If a tool returns nothing, say so honestly and suggest an alternative (e.g. browse /products or contact support).
-- For general questions unrelated to Trendy Shops (general knowledge, advice, casual chat), just answer helpfully and accurately like a capable assistant.
+- For general questions unrelated to TrendiShop (general knowledge, advice, casual chat), just answer helpfully and accurately like a capable assistant.
 - Always reply in the SAME language the user used. Support English and Bangla/Banglish naturally.
 
 STYLE:

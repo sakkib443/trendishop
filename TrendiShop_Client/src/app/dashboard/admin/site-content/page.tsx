@@ -240,7 +240,7 @@ function ContactTab({ data, setData }: { data: any; setData: any }) {
                     <div style={{ gridColumn: 'span 2' }}><label style={label}>WhatsApp Number</label><input value={c.whatsapp || ''} onChange={e => updateField('whatsapp', e.target.value)} placeholder="01XXXXXXXXX" style={input} /></div>
                     <div style={{ gridColumn: 'span 2' }}>
                         <label style={label}>Messenger (Facebook page link or username)</label>
-                        <input value={c.messenger || ''} onChange={e => updateField('messenger', e.target.value)} placeholder="facebook.com/trendyshops  or  trendyshops" style={input} />
+                        <input value={c.messenger || ''} onChange={e => updateField('messenger', e.target.value)} placeholder="facebook.com/trendishop  or  trendishop" style={input} />
                         <p style={{ fontSize: '11px', color: messengerId(c.messenger) || !c.messenger ? '#888' : '#dc2626', margin: '4px 0 0' }}>
                             {!c.messenger
                                 ? 'Leave empty if you do not use Messenger.'
@@ -268,7 +268,7 @@ function ContactTab({ data, setData }: { data: any; setData: any }) {
                     <div><label style={label}>Primary Address</label><input value={c.address || ''} onChange={e => updateField('address', e.target.value)} style={input} /></div>
                     <div><label style={label}>Corporate Office</label><input value={c.corporateOffice || ''} onChange={e => updateField('corporateOffice', e.target.value)} placeholder="Head office address" style={input} /></div>
                     <div><label style={label}>Warehouse Address</label><input value={c.warehouse || ''} onChange={e => updateField('warehouse', e.target.value)} placeholder="Warehouse address" style={input} /></div>
-                    <div style={{ gridColumn: 'span 2' }}><label style={label}>Website URL</label><input value={c.website || ''} onChange={e => updateField('website', e.target.value)} placeholder="trendyshopsbd.com" style={input} /></div>
+                    <div style={{ gridColumn: 'span 2' }}><label style={label}>Website URL</label><input value={c.website || ''} onChange={e => updateField('website', e.target.value)} placeholder="trendishop.com" style={input} /></div>
                 </div>
             </div>
 
@@ -344,7 +344,7 @@ function ContactTab({ data, setData }: { data: any; setData: any }) {
 const FLOATING_CHANNELS = [
     { key: 'phone', showKey: 'showPhone', title: 'Call button', contactLabel: 'Phone Number', href: telHref, placeholder: '01XXXXXXXXX', color: '#2563eb', invalid: 'Enter a phone number.' },
     { key: 'whatsapp', showKey: 'showWhatsapp', title: 'WhatsApp button', contactLabel: 'WhatsApp Number', href: whatsappHref, placeholder: '01XXXXXXXXX', color: '#25D366', invalid: 'Enter a WhatsApp number.' },
-    { key: 'messenger', showKey: 'showMessenger', title: 'Messenger button', contactLabel: 'Messenger', href: messengerHref, placeholder: 'facebook.com/trendyshops  or  trendyshops', color: '#0084FF', invalid: 'Enter a Facebook page link or username.' },
+    { key: 'messenger', showKey: 'showMessenger', title: 'Messenger button', contactLabel: 'Messenger', href: messengerHref, placeholder: 'facebook.com/trendishop  or  trendishop', color: '#0084FF', invalid: 'Enter a Facebook page link or username.' },
 ] as const;
 
 /**

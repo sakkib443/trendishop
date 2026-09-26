@@ -1,8 +1,8 @@
 {
-  "name": "extrain-shop",
+  "name": "trendishop",
   "version": "1.0.0",
   "private": true,
-  "description": "Extrain Shop — e-commerce platform. Next.js storefront + admin (TrendiShop_Client) and Express API (TrendiShop_Server).",
+  "description": "TrendiShop — e-commerce platform. Next.js storefront + admin (TrendiShop_Client) and Express API (TrendiShop_Server).",
   "scripts": {
     "install:all": "npm --prefix TrendiShop_Server install && npm --prefix TrendiShop_Client install",
     "dev": "node scripts/dev.mjs",

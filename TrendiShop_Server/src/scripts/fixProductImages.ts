@@ -11,7 +11,7 @@ const productSchema = new mongoose.Schema(
 const Product = mongoose.model('Product', productSchema);
 
 // Match each product by a name regex → set to the matching LOCAL image
-// (these files already ship in trendyshops_client/public/images/)
+// (these files already ship in trendishop_client/public/images/)
 const updates: { match: RegExp; thumbnail: string; images: string[] }[] = [
     { match: /yoga\s*mat/i,                 thumbnail: '/images/yoga_mat.png',         images: ['/images/yoga_mat.png'] },
     { match: /weighted\s*blanket/i,         thumbnail: '/images/weighted_blanket.png', images: ['/images/weighted_blanket.png'] },

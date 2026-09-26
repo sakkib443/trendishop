@@ -10,7 +10,7 @@ const NewsletterController = {
         sendResponse(res, {
             statusCode: 200,
             success: true,
-            message: 'Thanks for subscribing to Trendy Shops!',
+            message: 'Thanks for subscribing to TrendiShop!',
         });
     }),
 

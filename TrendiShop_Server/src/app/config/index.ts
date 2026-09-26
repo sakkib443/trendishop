@@ -9,8 +9,8 @@ export default {
     database_url: process.env.DATABASE_URL || 'mongodb://localhost:27017/trendyshops',
 
     jwt: {
-        access_secret: process.env.JWT_ACCESS_SECRET || 'trendyshops-access-secret',
-        refresh_secret: process.env.JWT_REFRESH_SECRET || 'trendyshops-refresh-secret',
+        access_secret: process.env.JWT_ACCESS_SECRET || 'trendishop-access-secret',
+        refresh_secret: process.env.JWT_REFRESH_SECRET || 'trendishop-refresh-secret',
         access_expires_in: process.env.JWT_ACCESS_EXPIRES_IN || '1d',
         refresh_expires_in: process.env.JWT_REFRESH_EXPIRES_IN || '7d',
     },
@@ -26,7 +26,7 @@ export default {
         port: Number(process.env.EMAIL_PORT) || 587,
         user: process.env.EMAIL_USER || '',
         pass: process.env.EMAIL_PASS || '',
-        from: process.env.EMAIL_FROM || 'noreply@trendyshopsbd.com',
+        from: process.env.EMAIL_FROM || 'noreply@trendishop.com',
     },
 
     frontend_url: process.env.FRONTEND_URL || 'http://localhost:3000',

@@ -71,16 +71,16 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "api.trendyshopsbd.com",
+        hostname: "api.trendishop.com",
       },
       // Production domain (uploaded images are served from the same origin).
       {
         protocol: "https",
-        hostname: "trendyshopsbd.com",
+        hostname: "trendishop.com",
       },
       {
         protocol: "https",
-        hostname: "www.trendyshopsbd.com",
+        hostname: "www.trendishop.com",
       },
       {
         protocol: "http",

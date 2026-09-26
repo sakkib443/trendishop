@@ -157,7 +157,7 @@ const NewFooter: React.FC = () => {
     };
 
     const year = new Date().getFullYear();
-    const companyName = siteRes?.data?.footer?.companyName || 'Trendy Shops';
+    const companyName = siteRes?.data?.footer?.companyName || 'TrendiShop';
     const copyright = siteRes?.data?.footer?.copyright || '© ' + year + ' ' + companyName + '. All rights reserved.';
 
     const accountLink = isAuthenticated

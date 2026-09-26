@@ -129,7 +129,7 @@ const RegisterPageInner = () => {
 
             <div className="mb-6 text-center">
                 <h1 className="text-2xl sm:text-[28px] font-extrabold text-slate-900 tracking-tight">Create your account</h1>
-                <p className="mt-1.5 text-sm text-slate-500">Join Trendy Shops for a better shopping experience.</p>
+                <p className="mt-1.5 text-sm text-slate-500">Join TrendiShop for a better shopping experience.</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">

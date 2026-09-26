@@ -1,10 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 198 48" role="img" aria-label="Trendy Shops BD">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 198 48" role="img" aria-label="TrendiShop BD">
   <!-- Static twin of components/shared/Logo.tsx — used for favicons, OG images
        and anywhere the React component cannot run. The brand colour is baked in
        here because a static file has no access to the CSS variable. -->
   <text x="0" y="33"
         font-family="Poppins, 'Segoe UI', Arial, Helvetica, sans-serif"
         font-size="26" font-weight="800" letter-spacing="-0.7">
-    <tspan fill="#202020">Trendy</tspan><tspan fill="#f15a24"> Shops</tspan><tspan fill="#f15a24" font-size="10" font-weight="700" letter-spacing="0.6" dy="-13">BD</tspan>
+    <tspan fill="#202020">Trendi</tspan><tspan fill="#f15a24">Shop</tspan><tspan fill="#f15a24" font-size="10" font-weight="700" letter-spacing="0.6" dy="-13">BD</tspan>
   </text>
 </svg>

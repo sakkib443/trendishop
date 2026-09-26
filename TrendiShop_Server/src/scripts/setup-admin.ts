@@ -35,7 +35,7 @@ async function setupAdmin() {
                 email: ADMIN_EMAIL,
                 password: ADMIN_PASSWORD,
                 firstName: 'Admin',
-                lastName: 'Trendy Shops',
+                lastName: 'TrendiShop',
                 role: 'admin',
                 status: 'active',
                 isEmailVerified: true,

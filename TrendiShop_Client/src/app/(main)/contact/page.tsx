@@ -3,7 +3,7 @@ import ContactClient from './ContactClient';
 
 export const metadata: Metadata = {
     title: "Contact Us — We're Here to Help",
-    description: "Get in touch with Trendy Shops. Call, email, or WhatsApp our team for orders, product questions, and support — we reply within minutes during business hours.",
+    description: "Get in touch with TrendiShop. Call, email, or WhatsApp our team for orders, product questions, and support — we reply within minutes during business hours.",
     alternates: { canonical: "/contact" },
 };
 

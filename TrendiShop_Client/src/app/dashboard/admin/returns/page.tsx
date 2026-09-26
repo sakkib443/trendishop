@@ -265,7 +265,7 @@ function AdminReturnsPageInner() {
                                             <span className="text-sm text-gray-600">{r.orderId || '—'}</span>
                                         </td>
                                         <td className="px-5 py-4">
-                                            <span className="text-sm text-gray-600">{r.shopName || 'Trendy Shops'}</span>
+                                            <span className="text-sm text-gray-600">{r.shopName || 'TrendiShop'}</span>
                                         </td>
                                         <td className="px-5 py-4">
                                             <OrderItemsPreview items={r.items} totalCount={r.items?.length} size={34} />
@@ -332,7 +332,7 @@ function AdminReturnsPageInner() {
                                 </div>
                                 <div>
                                     <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Shop</p>
-                                    <p className="text-sm font-medium text-gray-800">{selected.shopName || 'Trendy Shops'}</p>
+                                    <p className="text-sm font-medium text-gray-800">{selected.shopName || 'TrendiShop'}</p>
                                 </div>
                             </div>
 

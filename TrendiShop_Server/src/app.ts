@@ -86,7 +86,7 @@ app.use(cors({
 app.get('/', (req: Request, res: Response) => {
     res.status(200).json({
         success: true,
-        message: '🛒 Trendy Shops API Server is running!',
+        message: '🛒 TrendiShop API Server is running!',
         version: '1.0.0',
         environment: config.env,
         timestamp: new Date().toISOString(),

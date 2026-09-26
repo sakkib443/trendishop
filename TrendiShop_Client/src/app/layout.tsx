@@ -8,9 +8,9 @@ import { getSiteContent } from "@/lib/siteContent.server";
 import { cleanMarketingIds } from "@/lib/marketing";
 
 // Used until a super admin fills in Digital marketing → SEO, or if the API is down.
-const DEFAULT_TITLE = "Trendy Shops — Your trusted online marketplace";
-const DEFAULT_DESCRIPTION = "Shop quality products at the best prices with Trendy Shops, your trusted online marketplace in Bangladesh.";
-const DEFAULT_KEYWORDS = ["trendy shops", "trendyshops", "online shopping", "ecommerce", "bangladesh", "marketplace", "best deals", "products"];
+const DEFAULT_TITLE = "TrendiShop — Your trusted online marketplace";
+const DEFAULT_DESCRIPTION = "Shop quality products at the best prices with TrendiShop, your trusted online marketplace in Bangladesh.";
+const DEFAULT_KEYWORDS = ["trendishop", "trendishop", "online shopping", "ecommerce", "bangladesh", "marketplace", "best deals", "products"];
 
 // The title, description, keywords and the search-engine verification tags come
 // from the admin panel, read on the server so they are in the first HTML Google sees.
@@ -28,11 +28,11 @@ export async function generateMetadata(): Promise<Metadata> {
   if (ids.metaDomainVerification) other["facebook-domain-verification"] = ids.metaDomainVerification;
 
   return {
-    metadataBase: new URL("https://www.trendyshopsbd.com"),
-    title: { default: title, template: "%s | Trendy Shops" },
+    metadataBase: new URL("https://www.trendishop.com"),
+    title: { default: title, template: "%s | TrendiShop" },
     description,
     keywords: keywords.length ? keywords : DEFAULT_KEYWORDS,
-    applicationName: "Trendy Shops",
+    applicationName: "TrendiShop",
     icons: {
       icon: "/logo-mark.svg",
       shortcut: "/logo-mark.svg",
@@ -41,7 +41,7 @@ export async function generateMetadata(): Promise<Metadata> {
     alternates: { canonical: "/" },
     openGraph: {
       type: "website",
-      siteName: "Trendy Shops",
+      siteName: "TrendiShop",
       title,
       description,
       locale: "en_US",
@@ -80,7 +80,7 @@ export default function RootLayout({
         <script
           dangerouslySetInnerHTML={{
             __html:
-              "try{if(sessionStorage.getItem('trendyshops:preloaded')==='1'){" +
+              "try{if(sessionStorage.getItem('trendishop:preloaded')==='1'){" +
               "var s=document.createElement('style');" +
               "s.textContent='#trendy-preloader{display:none!important}';" +
               'document.head.appendChild(s)}}catch(e){}',

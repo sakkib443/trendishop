@@ -485,7 +485,7 @@ type Doc = InstanceType<typeof PDFDocument>;
 
 const drawHeader = (doc: Doc, color: string, title: string, subtitle: string, left: number, contentWidth: number) => {
     doc.rect(0, 0, doc.page.width, 90).fill(color);
-    doc.fillColor('#FFFFFF').fontSize(26).font('Helvetica-Bold').text('Trendy Shops', left, 24);
+    doc.fillColor('#FFFFFF').fontSize(26).font('Helvetica-Bold').text('TrendiShop', left, 24);
     doc.fontSize(13).font('Helvetica').text(title, left, 56);
     doc.fontSize(9)
         .font('Helvetica')
@@ -673,7 +673,7 @@ export const renderSalesReportPdf = (r: SalesReport): Promise<Buffer> =>
             { label: 'Paid', width: 0.25, align: 'right' },
         ], r.payments.map((m) => [m.method.toUpperCase(), String(m.orders), fmt(m.value), fmt(m.paid)]), 'No orders in this period.');
 
-        drawFooter(doc, 'Trendy Shops Admin · Internal sales report', left, contentWidth);
+        drawFooter(doc, 'TrendiShop Admin · Internal sales report', left, contentWidth);
     });
 
 /** The all-time platform PDF (kept for callers that send no period). */
@@ -729,7 +729,7 @@ const generateAdminReportPdf = async (): Promise<Buffer> => {
             { label: 'Sales', width: 0.3, align: 'right' },
         ], (byCategory as any[]).map((c) => [c.name || 'Uncategorized', String(c.totalItems || 0), fmt(c.totalSales || 0)]), 'No sales yet.');
 
-        drawFooter(doc, 'Trendy Shops Admin · Internal analytics report', left, contentWidth);
+        drawFooter(doc, 'TrendiShop Admin · Internal analytics report', left, contentWidth);
     });
 };
 

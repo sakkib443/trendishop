@@ -67,7 +67,7 @@ export default function SearchConsolePage() {
                         <>Or add the site by hand, choose the <b>Meta tag</b> option, paste it above and save.</>,
                     ]} />
                     <Note>
-                        Verify the address people will actually use. Once <b>trendyshopsbd.com</b> is connected,
+                        Verify the address people will actually use. Once <b>trendishop.com</b> is connected,
                         add it as its own property — the temporary address is a different site to Google.
                     </Note>
                 </div>

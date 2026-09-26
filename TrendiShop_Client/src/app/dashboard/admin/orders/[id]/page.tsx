@@ -98,7 +98,7 @@ interface OrderPackage {
 
 // An order may still be corrected while it is one of these and no parcel has gone to the
 // courier. Mirrors EDITABLE_STATUSES / editBlockedReason() in
-// ShohozKitchen_Server/src/app/modules/order/order.service.ts — change the two together.
+// TrendiShop_Server/src/app/modules/order/order.service.ts — change the two together.
 // The server decides; this only decides whether to offer the button, and says why not.
 const EDITABLE_STATUSES = ['pending', 'confirmed', 'processing'];
 
@@ -129,14 +129,14 @@ interface CourierOrder {
 // Steadfast's public tracking page — the code must be pasted there; there is no verified deep-link format.
 const STEADFAST_TRACKING_URL = 'https://steadfast.com.bd/tracking';
 
-// Package statuses the API refuses to book (TERMINAL_STATUSES in ShohozKitchen_Server/src/app/modules/courier/courier.service.ts).
+// Package statuses the API refuses to book (TERMINAL_STATUSES in TrendiShop_Server/src/app/modules/courier/courier.service.ts).
 const UNSENDABLE_STATUSES = ['delivered', 'cancelled', 'returned', 'refunded'];
 
 /** The server's error message from an RTK Query failure, else the fallback. */
 const apiError = (e: unknown, fallback: string) =>
     (e as { data?: { message?: string } } | null)?.data?.message || fallback;
 
-// Mirrors codFor(order, pkg) in ShohozKitchen_Server/src/app/modules/courier/courier.service.ts —
+// Mirrors codFor(order, pkg) in TrendiShop_Server/src/app/modules/courier/courier.service.ts —
 // change the two together. Read-only: it only shows the amount; the server works it out
 // again when it books.
 function codFor(order: CourierOrder, pkg: { _id: string; subtotal: number }): number {

@@ -1,5 +1,5 @@
 /**
- * Trendy Shops — demo business data, so the client can open every admin page and
+ * TrendiShop — demo business data, so the client can open every admin page and
  * see it working: customers, ~45 orders over the last 75 days (revenue, statuses,
  * returns), courier payouts, a fraud-check flag, suppliers, purchases, warehouses,
  * transfers, expenses and investors. Products that have no cost price get one

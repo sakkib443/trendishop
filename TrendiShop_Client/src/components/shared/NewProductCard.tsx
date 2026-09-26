@@ -286,8 +286,8 @@ const NewProductCard: React.FC<NewProductCardProps> = ({ product }) => {
 /* ═══════════════════════════════════════════════ */
 
 // localStorage helpers — track which reviews/replies this device has liked
-const LIKED_REVIEWS_KEY = 'trendyshops_liked_reviews';
-const LIKED_REPLIES_KEY = 'trendyshops_liked_replies';
+const LIKED_REVIEWS_KEY = 'trendishop_liked_reviews';
+const LIKED_REPLIES_KEY = 'trendishop_liked_replies';
 
 const getLikedSet = (key: string): Set<string> => {
     if (typeof window === 'undefined') return new Set();

@@ -28,7 +28,7 @@
  *          1XXXXXXXXX gets its 0 back, so +880 1712-345678, 8801712345678
  *          and 01712345678 are all 01712345678.
  *   email: trimmed and lowercased. Empty emails and the placeholders made for
- *          guests and admin-placed orders (<phone>@guest.trendyshopsbd.com) are
+ *          guests and admin-placed orders (<phone>@guest.trendishop.com) are
  *          ignored, because the phone already covers them.
  * ──────────────────────────────────────────────────────────────────── */
 
@@ -50,7 +50,7 @@ export type MatchKind = (typeof MATCH_KINDS)[number];
 /** A flag keeps at most this many previous returns (the count is always exact). */
 export const MAX_PREVIOUS_RETURNS = 10;
 
-const PLACEHOLDER_EMAIL_DOMAIN = '@guest.trendyshopsbd.com';
+const PLACEHOLDER_EMAIL_DOMAIN = '@guest.trendishop.com';
 
 export const RETURN_REASON_LABELS: Record<string, string> = {
     defective: 'Defective',
@@ -388,7 +388,7 @@ export function parseLookupQuery(raw: unknown): { type: 'phone' | 'email'; value
     if (q.includes('@')) {
         const e = normalizeEmail(q);
         if (!e) return null;
-        // A guest placeholder (01712345678@guest.trendyshopsbd.com) is really a phone number.
+        // A guest placeholder (01712345678@guest.trendishop.com) is really a phone number.
         if (isPlaceholderEmail(e)) {
             const p = normalizePhone(e.split('@')[0]);
             return p.length >= 10 ? { type: 'phone', value: p } : null;

@@ -8,7 +8,7 @@ import { useVerifyPaymentQuery } from '@/redux/api/paymentApi';
 import { useAppDispatch } from '@/redux';
 import { clearCart } from '@/redux/slices/cartSlice';
 
-const COUPON_STORAGE_KEY = 'trendyshops_applied_coupon';
+const COUPON_STORAGE_KEY = 'trendishop_applied_coupon';
 
 const PaymentSuccessInner = () => {
     const params = useSearchParams();

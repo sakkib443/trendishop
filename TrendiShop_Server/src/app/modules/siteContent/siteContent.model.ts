@@ -81,7 +81,7 @@ const siteContentSchema = new Schema({
 
     // ── Footer ──
     footer: {
-        companyName: { type: String, default: 'Trendy Shops' },
+        companyName: { type: String, default: 'TrendiShop' },
         copyright: { type: String, default: '' },
         links: [{
             label: { type: String, required: true },
@@ -94,7 +94,7 @@ const siteContentSchema = new Schema({
 
     // ── General Store Info (Settings page) ──
     general: {
-        storeName: { type: String, default: 'Trendy Shops' },
+        storeName: { type: String, default: 'TrendiShop' },
         tagline: { type: String, default: 'Your trusted online marketplace' },
         currency: { type: String, default: 'BDT' },
     },
@@ -103,9 +103,9 @@ const siteContentSchema = new Schema({
     // Super admin only (PUT /site-content/seo). The storefront's <title>, description
     // and keywords come from here.
     seo: {
-        title: { type: String, default: 'Trendy Shops - Your trusted online marketplace' },
-        description: { type: String, default: 'Shop the latest products with amazing deals at Trendy Shops.' },
-        keywords: { type: String, default: 'trendy shops, trendyshops, ecommerce, online shopping' },
+        title: { type: String, default: 'TrendiShop - Your trusted online marketplace' },
+        description: { type: String, default: 'Shop the latest products with amazing deals at TrendiShop.' },
+        keywords: { type: String, default: 'trendishop, trendishop, ecommerce, online shopping' },
     },
 
     // ── Digital marketing — super admin only (PUT /site-content/marketing) ──

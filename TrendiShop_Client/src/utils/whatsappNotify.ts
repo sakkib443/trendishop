@@ -20,7 +20,7 @@ export function sendOrderToWhatsApp(data: {
         `${i + 1}. ${item.name || 'Product'} × ${item.quantity}${item.color ? ` (${item.color})` : ''}${item.size ? ` [${item.size}]` : ''}${item.price ? ` — ৳${item.price}` : ''}`
     ).join('\n');
 
-    const msg = `🛒 *New Order — Trendy Shops*
+    const msg = `🛒 *New Order — TrendiShop*
 
 👤 *Name:* ${data.customerName}
 📞 *Contact:* ${data.customerContact}
@@ -50,7 +50,7 @@ export function sendInquiryToWhatsApp(data: {
     if (!phone.replace(/[^0-9]/g, '')) return; // no WhatsApp number set yet
     const variantInfo = [data.color, data.size].filter(Boolean).join(' / ');
 
-    const msg = `❓ *New Inquiry — Trendy Shops*
+    const msg = `❓ *New Inquiry — TrendiShop*
 
 👤 *Name:* ${data.customerName}
 📞 *Contact:* ${data.customerContact}

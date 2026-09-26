@@ -1,6 +1,6 @@
-# ShohozKitchen_Server
+# TrendiShop_Server
 
-Backend API for **Trendy Shops** — a multi-vendor e-commerce marketplace.
+Backend API for **TrendiShop** — a multi-vendor e-commerce marketplace.
 
 Built with **Express**, **TypeScript**, **MongoDB / Mongoose**, JWT auth, and Cloudinary uploads.
 

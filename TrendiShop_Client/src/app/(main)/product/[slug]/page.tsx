@@ -206,7 +206,7 @@ export default function ProductDetailsPage() {
         }
 
         try {
-            localStorage.setItem('trendyshops_selected_cart', JSON.stringify([cartId]));
+            localStorage.setItem('trendishop_selected_cart', JSON.stringify([cartId]));
         } catch {}
 
         router.push('/checkout');
@@ -763,7 +763,7 @@ export default function ProductDetailsPage() {
                             {/* Support */}
                             <div style={{ padding: '14px' }}>
                                 <p style={{ fontSize: '11px', color: '#9ca3af', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', margin: '0 0 8px' }}>Need help?</p>
-                                <p style={{ fontSize: '13px', fontWeight: 700, color: '#111', margin: '0 0 12px' }}>Trendy Shops</p>
+                                <p style={{ fontSize: '13px', fontWeight: 700, color: '#111', margin: '0 0 12px' }}>TrendiShop</p>
                                 <button onClick={handleChatNow} disabled={isStartingChat}
                                     style={{ width: '100%', height: '34px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px', background: '#fff', border: '1.5px solid var(--color-primary)', color: 'var(--color-primary)', fontWeight: 600, fontSize: '12px', cursor: isStartingChat ? 'wait' : 'pointer', borderRadius: '4px', opacity: isStartingChat ? 0.7 : 1 }}>
                                     <FiMessageSquare size={13} /> {isStartingChat ? 'Opening...' : 'Chat Now'}

@@ -17,8 +17,8 @@ import { useGetShippingQuoteQuery, useGetShippingSettingsQuery } from '@/redux/a
 import { useGetProductByIdQuery } from '@/redux/api/productApi';
 import { getDisplayPrice } from '@/utils/offerPrice';
 
-const COUPON_STORAGE_KEY = 'trendyshops_applied_coupon';
-const SELECTED_STORAGE_KEY = 'trendyshops_selected_cart';
+const COUPON_STORAGE_KEY = 'trendishop_applied_coupon';
+const SELECTED_STORAGE_KEY = 'trendishop_selected_cart';
 
 // Resolve common colour names to a CSS hex so the swatch dot always renders.
 const COLOR_HEX_MAP: Record<string, string> = {
