@@ -50,6 +50,17 @@ class QueryBuilder<T> {
         const excludeFields = ['searchTerm', 'search', 'sort', 'limit', 'page', 'fields'];
         excludeFields.forEach((el) => delete queryObj[el]);
 
+        // Date range filter on createdAt (e.g. Today / Yesterday / custom range).
+        // Only kicks in when a bound is passed, so other modules are unaffected.
+        if (queryObj.startDate || queryObj.endDate) {
+            const createdAt: Record<string, Date> = {};
+            if (queryObj.startDate) createdAt.$gte = new Date(queryObj.startDate as string);
+            if (queryObj.endDate) createdAt.$lte = new Date(queryObj.endDate as string);
+            (queryObj as any).createdAt = createdAt;
+            delete queryObj.startDate;
+            delete queryObj.endDate;
+        }
+
         // Price range filter
         if (queryObj.minPrice || queryObj.maxPrice) {
             (queryObj as any).price = {};

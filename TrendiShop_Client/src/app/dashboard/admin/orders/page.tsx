@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, useMemo, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { LuPlus, LuDownload, LuEye, LuExternalLink, LuStickyNote, LuX, LuPackage, LuBarcode, LuReceiptText } from 'react-icons/lu';
@@ -17,7 +17,7 @@ import { toast } from 'react-hot-toast';
 import { ORDER_STATUS_CONFIG, getStatusConfig, paymentMethodLabel } from '@/lib/orderStatus';
 import {
     PageHeader, Btn, SearchInput, SelectPill, FilterBar, StatTile, Badge, BadgeSelect, TableCard,
-    TH, TD, TR, EmptyRow, SkeletonRows, Pager, RowMenu, Modal, TEXTAREA, taka, fmtDateTime, cx, type Tone,
+    TH, TD, TR, EmptyRow, SkeletonRows, Pager, RowMenu, Modal, TEXTAREA, INPUT, taka, fmtDateTime, cx, type Tone,
 } from '@/components/admin/ui';
 import PrintOrdersModal, { type PrintJob, type PrintKind } from '@/components/admin/print/PrintOrdersModal';
 import { useSelector } from 'react-redux';
@@ -56,6 +56,47 @@ function money(o: any) {
     return { paid: 0, due: total };
 }
 
+const DATE_PRESETS = [
+    { value: 'all', label: 'All time' },
+    { value: 'today', label: 'Today' },
+    { value: 'yesterday', label: 'Yesterday' },
+    { value: 'last7', label: 'Last 7 days' },
+    { value: 'last30', label: 'Last 30 days' },
+    { value: 'thisMonth', label: 'This month' },
+    { value: 'custom', label: 'Custom range' },
+];
+
+const startOfDay = (d: Date) => { const x = new Date(d); x.setHours(0, 0, 0, 0); return x; };
+const endOfDay = (d: Date) => { const x = new Date(d); x.setHours(23, 59, 59, 999); return x; };
+const daysAgo = (n: number) => { const x = new Date(); x.setDate(x.getDate() - n); return x; };
+
+/**
+ * Local-day bounds for the chosen preset, as ISO strings. The API filters
+ * `createdAt` between them, so "Today" means the admin's own calendar day.
+ */
+function dateRangeFor(preset: string, from: string, to: string): { startDate?: string; endDate?: string } {
+    const now = new Date();
+    switch (preset) {
+        case 'today':
+            return { startDate: startOfDay(now).toISOString(), endDate: endOfDay(now).toISOString() };
+        case 'yesterday':
+            return { startDate: startOfDay(daysAgo(1)).toISOString(), endDate: endOfDay(daysAgo(1)).toISOString() };
+        case 'last7':
+            return { startDate: startOfDay(daysAgo(6)).toISOString(), endDate: endOfDay(now).toISOString() };
+        case 'last30':
+            return { startDate: startOfDay(daysAgo(29)).toISOString(), endDate: endOfDay(now).toISOString() };
+        case 'thisMonth':
+            return { startDate: startOfDay(new Date(now.getFullYear(), now.getMonth(), 1)).toISOString(), endDate: endOfDay(now).toISOString() };
+        case 'custom':
+            return {
+                startDate: from ? startOfDay(new Date(`${from}T00:00:00`)).toISOString() : undefined,
+                endDate: to ? endOfDay(new Date(`${to}T00:00:00`)).toISOString() : undefined,
+            };
+        default:
+            return {};
+    }
+}
+
 function useDebounced<T>(value: T, ms = 300) {
     const [v, setV] = useState(value);
     useEffect(() => { const t = setTimeout(() => setV(value), ms); return () => clearTimeout(t); }, [value, ms]);
@@ -80,6 +121,10 @@ function OrdersPageInner() {
     );
     const [paymentFilter, setPaymentFilter] = useState('all');
     const [productFilter, setProductFilter] = useState('all');
+    const [datePreset, setDatePreset] = useState('all');
+    const [customFrom, setCustomFrom] = useState('');
+    const [customTo, setCustomTo] = useState('');
+    const dateRange = useMemo(() => dateRangeFor(datePreset, customFrom, customTo), [datePreset, customFrom, customTo]);
     const [page, setPage] = useState(1);
     const [selected, setSelected] = useState<Set<string>>(new Set());
     const [bulkStatus, setBulkStatus] = useState('');
@@ -95,6 +140,8 @@ function OrdersPageInner() {
         paymentStatus: paymentFilter !== 'all' ? paymentFilter : undefined,
         'items.product': productFilter !== 'all' ? productFilter : undefined,
         searchTerm: q || undefined,
+        startDate: dateRange.startDate,
+        endDate: dateRange.endDate,
     });
     const { data: statsData } = useGetOrderStatsQuery({});
     const { data: productsData } = useGetProductsQuery({ limit: 200, sort: 'name', fields: 'name' });
@@ -261,6 +308,17 @@ function OrdersPageInner() {
                     options={[{ value: 'all', label: 'All payments' }, ...PAYMENT_OPTIONS]} />
                 <SelectPill ariaLabel="Product" className="sm:w-56" value={productFilter} onChange={(v) => { setProductFilter(v); resetPage(); }}
                     options={[{ value: 'all', label: 'All products' }, ...products.map((p) => ({ value: p._id, label: p.name }))]} />
+                <SelectPill ariaLabel="Date placed" className="sm:w-44" value={datePreset} onChange={(v) => { setDatePreset(v); resetPage(); }}
+                    options={DATE_PRESETS} />
+                {datePreset === 'custom' && (
+                    <div className="flex items-center gap-2">
+                        <input type="date" aria-label="From date" className={cx(INPUT, 'sm:w-40')} max={customTo || undefined}
+                            value={customFrom} onChange={(e) => { setCustomFrom(e.target.value); resetPage(); }} />
+                        <span className="text-sm text-gray-400">to</span>
+                        <input type="date" aria-label="To date" className={cx(INPUT, 'sm:w-40')} min={customFrom || undefined}
+                            value={customTo} onChange={(e) => { setCustomTo(e.target.value); resetPage(); }} />
+                    </div>
+                )}
             </FilterBar>
 
             {/* Bulk action bar */}
