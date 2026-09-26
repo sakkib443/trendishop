@@ -2,19 +2,19 @@
   "name": "extrain-shop",
   "version": "1.0.0",
   "private": true,
-  "description": "Extrain Shop — e-commerce platform. Next.js storefront + admin (ShohozKitchen_Client) and Express API (ShohozKitchen_Server).",
+  "description": "Extrain Shop — e-commerce platform. Next.js storefront + admin (TrendiShop_Client) and Express API (TrendiShop_Server).",
   "scripts": {
-    "install:all": "npm --prefix ShohozKitchen_Server install && npm --prefix ShohozKitchen_Client install",
+    "install:all": "npm --prefix TrendiShop_Server install && npm --prefix TrendiShop_Client install",
     "dev": "node scripts/dev.mjs",
-    "dev:api": "npm --prefix ShohozKitchen_Server run start:dev",
-    "dev:web": "npm --prefix ShohozKitchen_Client run dev",
-    "build": "npm --prefix ShohozKitchen_Server run build && npm --prefix ShohozKitchen_Client run build",
-    "build:api": "npm --prefix ShohozKitchen_Server run build",
-    "build:web": "npm --prefix ShohozKitchen_Client run build",
-    "typecheck": "cd ShohozKitchen_Server && npx tsc --noEmit && cd ../ShohozKitchen_Client && npx tsc --noEmit",
-    "lint:web": "npm --prefix ShohozKitchen_Client run lint",
-    "db": "npm --prefix ShohozKitchen_Server run db",
-    "seed:demo": "npm --prefix ShohozKitchen_Server run seed:electrical"
+    "dev:api": "npm --prefix TrendiShop_Server run start:dev",
+    "dev:web": "npm --prefix TrendiShop_Client run dev",
+    "build": "npm --prefix TrendiShop_Server run build && npm --prefix TrendiShop_Client run build",
+    "build:api": "npm --prefix TrendiShop_Server run build",
+    "build:web": "npm --prefix TrendiShop_Client run build",
+    "typecheck": "cd TrendiShop_Server && npx tsc --noEmit && cd ../TrendiShop_Client && npx tsc --noEmit",
+    "lint:web": "npm --prefix TrendiShop_Client run lint",
+    "db": "npm --prefix TrendiShop_Server run db",
+    "seed:demo": "npm --prefix TrendiShop_Server run seed:electrical"
   },
   "engines": {
     "node": ">=20"

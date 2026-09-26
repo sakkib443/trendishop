@@ -3,8 +3,8 @@
 import { spawn } from 'node:child_process';
 
 const apps = [
-    { name: 'api', color: '\x1b[36m', args: ['--prefix', 'ShohozKitchen_Server', 'run', 'start:dev'] },
-    { name: 'web', color: '\x1b[35m', args: ['--prefix', 'ShohozKitchen_Client', 'run', 'dev'] },
+    { name: 'api', color: '\x1b[36m', args: ['--prefix', 'TrendiShop_Server', 'run', 'start:dev'] },
+    { name: 'web', color: '\x1b[35m', args: ['--prefix', 'TrendiShop_Client', 'run', 'dev'] },
 ];
 
 const children = apps.map(({ name, color, args }) => {

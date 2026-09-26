@@ -17,7 +17,7 @@ import { fileURLToPath } from 'node:url';
 
 const OUT = resolve(
     dirname(fileURLToPath(import.meta.url)),
-    '..', '..', 'ShohozKitchen_Client', 'public', 'products',
+    '..', '..', 'TrendiShop_Client', 'public', 'products',
 );
 
 /** Each illustration sits on a tinted square, drawn on a 400×400 grid. */
