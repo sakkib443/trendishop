@@ -1,7 +1,7 @@
 import ShipForMePage from '@/components/home/ShipForMePage';
 
 export const metadata = {
-    title: 'Ship For Me | Sinortiglobal',
+    title: 'Ship For Me',
     description: 'Simplify your shipping with our Ship for Me service.',
 };
 

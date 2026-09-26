@@ -48,6 +48,7 @@ const PRIMARY_LINKS: { href: string; label: string; highlight?: boolean }[] = [
     { href: '/services', label: 'Services' },
     { href: '/products?sort=discount', label: 'Offer', highlight: true },
     { href: '/ship-for-me', label: 'Ship For Me' },
+    { href: '/quotations', label: 'Request Product' },
 ];
 
 /** Row 4 — the announcement ticker. Edit this list to change what scrolls. */

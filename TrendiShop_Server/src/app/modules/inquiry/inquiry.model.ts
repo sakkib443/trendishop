@@ -8,6 +8,9 @@ const inquirySchema = new Schema(
         phone: { type: String, required: true, maxlength: 100, trim: true },
         subject: { type: String, default: 'General Inquiry', maxlength: 200, trim: true },
         message: { type: String, required: true, maxlength: 2000, trim: true },
+        // Reference photos a customer attaches when requesting a product we don't
+        // stock (the /quotations order-request form uploads these to /upload/images).
+        images: { type: [String], default: [] },
         status: { type: String, enum: ['pending', 'read', 'replied', 'resolved', 'closed'], default: 'pending' },
         adminReply: { type: String, default: '' },
     },

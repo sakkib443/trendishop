@@ -1,7 +1,7 @@
 import CostCalculatorPage from '@/components/home/CostCalculatorPage';
 
 export const metadata = {
-    title: 'Shipping Cost Calculator | Sinortiglobal',
+    title: 'Shipping Cost Calculator',
     description: 'Calculate your international shipping cost instantly.',
 };
 

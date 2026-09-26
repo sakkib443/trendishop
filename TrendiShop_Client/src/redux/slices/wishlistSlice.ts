@@ -15,7 +15,7 @@ interface WishlistState {
     totalItems: number;
 }
 
-const STORAGE_KEY = 'sinortiglobal_wishlist';
+const STORAGE_KEY = 'trendishop_wishlist';
 
 const loadFromStorage = (): WishlistItem[] => {
     if (typeof window === 'undefined') return [];
