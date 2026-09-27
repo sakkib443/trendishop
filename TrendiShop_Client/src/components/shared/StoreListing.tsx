@@ -12,19 +12,6 @@ import { FiChevronDown, FiX, FiSearch, FiFilter, FiStar } from 'react-icons/fi';
 
 const LIMIT = 24;
 
-const FALLBACK_CATEGORIES = [
-    { _id: 'f-electronics', name: 'Electronics', icon: '📱' },
-    { _id: 'f-fashion', name: 'Fashion & Clothing', icon: '👗' },
-    { _id: 'f-home', name: 'Home & Kitchen', icon: '🏠' },
-    { _id: 'f-health', name: 'Health & Beauty', icon: '💊' },
-    { _id: 'f-sports', name: 'Sports & Outdoors', icon: '⚽' },
-    { _id: 'f-books', name: 'Books & Stationery', icon: '📚' },
-    { _id: 'f-grocery', name: 'Grocery & Food', icon: '🛒' },
-    { _id: 'f-toys', name: 'Toys & Kids', icon: '🧸' },
-    { _id: 'f-shoes', name: 'Shoes & Footwear', icon: '👟' },
-    { _id: 'f-accessories', name: 'Watches & Accessories', icon: '⌚' },
-];
-
 const SORT_OPTIONS = [
     { label: 'Best Match', value: '' },
     { label: 'Newest First', value: '-createdAt' },
@@ -387,8 +374,10 @@ const StoreListing: React.FC<StoreListingProps> = ({
     /* categories */
     const { data: categoriesData } = useGetCategoriesQuery({});
     const categories = useMemo(() => {
+        // Real categories only — while the request is in flight the filter simply
+        // shows "All Categories" and fills in, never placeholder categories.
         const api = categoriesData?.data;
-        return api?.length > 0 ? api : FALLBACK_CATEGORIES;
+        return Array.isArray(api) ? api : [];
     }, [categoriesData]);
 
     /* brands (server-provided distinct list) */
@@ -397,6 +386,14 @@ const StoreListing: React.FC<StoreListingProps> = ({
         const api = brandsData?.data;
         return Array.isArray(api) ? api : [];
     }, [brandsData]);
+
+    /* The category/brand lists come from a client fetch (or a persisted cache)
+       that the server render does not have. Rendering them straight away makes
+       the first client render differ from the SSR HTML → a hydration mismatch.
+       Gate the data-driven filter lists behind mount so both renders agree, then
+       fill in on the client. */
+    const [mounted, setMounted] = useState(false);
+    useEffect(() => { setMounted(true); }, []);
 
     /* sync URL → state */
     useEffect(() => {
@@ -453,7 +450,7 @@ const StoreListing: React.FC<StoreListingProps> = ({
         });
     }, [rawProducts, minRating, inStockOnly]);
 
-    const activeCategoryName = categories.find((c: any) => c._id === selectedCategory)?.name || '';
+    const activeCategoryName = mounted ? (categories.find((c: any) => c._id === selectedCategory)?.name || '') : '';
     const hasActiveFilters = !!(
         (showCategoryFilter && selectedCategory) ||
         activeSearch ||
@@ -508,7 +505,7 @@ const StoreListing: React.FC<StoreListingProps> = ({
     }, [page, totalPages]);
 
     const filterPanelProps = {
-        categories,
+        categories: mounted ? categories : [],
         selectedCategory,
         priceRange,
         minRating,
