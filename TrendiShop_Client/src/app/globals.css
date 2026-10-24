@@ -138,7 +138,7 @@ h6 {
    overhung it by about 160px a side. One width now, and the page lines up. */
 .container {
   width: 100%;
-  max-width: 1400px;
+  max-width: 1600px;
   margin-left: auto;
   margin-right: auto;
   padding-left: 1rem;
@@ -971,39 +971,35 @@ h6 {
 
 /* ═══════════════════════════════════════════════════════════════════
    PRODUCT CARD
-   A white picture well above a tinted detail panel, with the two round
-   controls straddling the seam between them. Written here rather than as
-   utility soup so the card can be restyled in one place.
+   Flat and straight: a white picture well above a tinted detail panel, a
+   thin border instead of shadows, and a straight seam between the two (no
+   wave). Written here rather than as utility soup so the card can be
+   restyled in one place.
    ═══════════════════════════════════════════════════════════════════ */
 
 :root {
-  /* The card's lower panel. One value, used by the panel itself, by the shelf
-     that rises over the controls, and by the concave fillet joining the two —
-     they have to match exactly or the seam between them shows. */
-  --pc-panel: #eff1f3;
+  /* The card's lower panel and the one border colour used across the card. */
+  --pc-panel: #f6f7f8;
+  --pc-line: #e5e7eb;
 
-  /* How far the shelf rises over the picture. The picture well stops exactly
-     this far short of its own bottom, so the two move together from one value
-     and the photograph never ends up behind the controls. */
-  --pc-notch-h: 46px;
+  /* White margin between the photo and the edges of its square. */
+  --pc-pic-pad: 4px;
 }
 
 .pc {
-  border-radius: 24px;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, .05), 0 0 0 1px rgba(15, 23, 42, .06);
+  border: 1px solid var(--pc-line);
+  border-radius: 12px;
 }
 
 .pc:hover {
-  box-shadow: 0 18px 34px -18px rgba(15, 23, 42, .22), 0 0 0 1px rgba(15, 23, 42, .09);
+  border-color: #cbd5e1;
 }
 
-/* The detail panel. A hair darker than the page so the picture above it
-   reads as lit, which is what gives the card its depth. */
+/* The detail panel. A hair darker than the picture, split from it by one
+   straight line. */
 .pc-body {
   background: var(--pc-panel);
-  /* Top-right stays square: the two round controls sit in that corner, and a
-     radius there would leave a sliver of card showing behind them. */
-  border-radius: 16px 0 16px 16px;
+  border-top: 1px solid var(--pc-line);
 }
 
 /* ── Badges ───────────────────────────────────────────────────────── */
@@ -1044,13 +1040,13 @@ h6 {
   border-radius: 999px;
   background: #ffffff;
   color: #475569;
-  box-shadow: 0 2px 6px rgba(15, 23, 42, .10), 0 0 0 1px rgba(15, 23, 42, .06);
-  transition: color .2s, background-color .2s, transform .2s;
+  border: 1px solid var(--pc-line);
+  transition: color .2s, border-color .2s;
 }
 
 .pc-icon:hover {
   color: var(--color-primary);
-  transform: translateY(-1px);
+  border-color: var(--color-primary);
 }
 
 .pc-icon.is-on {
@@ -1076,7 +1072,6 @@ h6 {
   font-size: 11.5px;
   font-weight: 600;
   line-height: 1;
-  box-shadow: 0 2px 6px rgba(21, 128, 61, .35);
 }
 
 /* ── Copy ─────────────────────────────────────────────────────────── */
@@ -1139,15 +1134,15 @@ h6 {
   font-size: 15px;
   font-weight: 600;
   white-space: nowrap;
-  box-shadow: 0 2px 6px rgba(15, 23, 42, .08), 0 0 0 1px rgba(15, 23, 42, .10);
-  transition: background-color .2s, color .2s, box-shadow .2s;
+  border: 1px solid var(--pc-line);
+  transition: background-color .2s, color .2s, border-color .2s;
   cursor: pointer;
 }
 
 .pc-cart:hover:not(:disabled) {
   background: var(--color-primary);
+  border-color: var(--color-primary);
   color: #ffffff;
-  box-shadow: 0 6px 16px -6px rgba(var(--color-primary-rgb), .6);
 }
 
 .pc-cart:disabled {
@@ -1207,7 +1202,7 @@ h6 {
    ═══════════════════════════════════════════════════════════════════ */
 .shell {
   width: 100%;
-  max-width: 1400px;
+  max-width: 1600px;
   margin-left: auto;
   margin-right: auto;
   padding-left: 1rem;
@@ -1308,59 +1303,22 @@ h6 {
   box-shadow: 0 1px 2px rgba(15, 23, 42, .08), inset 0 0 0 1px rgba(15, 23, 42, .08);
 }
 
-/* ── The notch ────────────────────────────────────────────────────────
-   The detail panel's top edge does not run straight past the wishlist and
-   compare controls — it climbs over them, so the two sit in a shelf of the
-   panel's own colour rather than floating on the seam.
-
-   Three pieces: the shelf itself (a pill rising above the panel, flush to
-   the card's right edge), and a concave fillet to its left where the edge
-   sweeps back down to the panel. The fillet is a radial-gradient rather
-   than a border-radius, because a border can only bulge outward — carving
-   an inward curve needs the paint itself to stop on a circle. */
+/* ── Wishlist / compare ───────────────────────────────────────────────
+   The photo fills the whole square, so the two controls sit over its
+   bottom-right corner, just above the straight seam. */
 
 .pc-notch {
   position: absolute;
-  right: 0;
-  bottom: 100%;
+  right: calc(var(--pc-pic-pad) + 8px);
+  bottom: calc(100% + var(--pc-pic-pad) + 8px);
   z-index: 20;
   display: flex;
-  /* The controls sit low in the shelf rather than centred in it, which leaves
-     more grey above them — that headroom is what lets the curve read as a
-     sweep over their heads instead of a bump hugging them. */
-  align-items: flex-end;
   gap: 8px;
-  /* Taller than the controls it holds. Shared with the picture well's bottom
-     inset, so the photograph always stops exactly where this begins. */
-  height: var(--pc-notch-h);
-  padding: 0 12px 0 16px;
-  background: var(--pc-panel);
-  border-top-left-radius: 28px;
-  border-top-right-radius: 24px;
-}
-
-.pc-notch::before {
-  content: '';
-  position: absolute;
-  right: 100%;
-  bottom: 0;
-  width: 26px;
-  height: 26px;
-  /* Grey everywhere except a quarter-circle bitten out of the top left —
-     that bite is the wave. */
-  background: radial-gradient(circle 26px at top left, transparent 26px, var(--pc-panel) 26px);
-}
-
-/* The controls sit on the shelf, so they lose the ring they wore when they
-   floated over the picture. */
-.pc-notch .pc-icon {
-  box-shadow: 0 1px 3px rgba(15, 23, 42, .12);
 }
 
 /* ── Picture well ─────────────────────────────────────────────────────
-   The outer box keeps the card's square; the inner one holds the photo
-   and ends where the shelf begins, so the product is never behind the
-   wishlist and compare controls. */
+   The outer box keeps the card's square; the inner one holds the photo and
+   fills all of it but a thin even margin. */
 .pc-pic {
   position: relative;
   display: block;
@@ -1371,8 +1329,10 @@ h6 {
 
 .pc-pic-inner {
   position: absolute;
-  inset: 0 0 var(--pc-notch-h) 0;
+  inset: var(--pc-pic-pad);
   display: block;
+  overflow: hidden;
+  border-radius: 8px;
 }
 
 /* ── Featured category tile ───────────────────────────────────────────

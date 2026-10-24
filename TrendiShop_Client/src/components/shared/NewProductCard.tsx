@@ -180,16 +180,15 @@ const NewProductCard: React.FC<NewProductCardProps> = ({ product }) => {
     const inStock = product.stock === undefined || product.stock > 0;
 
     return (
-        <div className='pc group relative flex h-full flex-col overflow-hidden bg-white transition-shadow duration-300'>
+        <div className='pc group relative flex h-full flex-col overflow-hidden bg-white transition-colors duration-300'>
 
             {/* ── Picture ──────────────────────────────────────────────────
                 A fixed square so every card in a row lines up whatever the
                 source image's aspect ratio is. object-contain, not cover: a
                 packshot cropped to fill loses the edges of the product. */}
-            {/* The inner box stops short of the bottom by exactly the shelf's
-                height, so the photograph never runs behind the two controls —
-                padding could not do this, because `fill` positions against the
-                padding box and would ignore it. */}
+            {/* The inner box is inset by --pc-pic-pad on every side, which gives
+                the photo its even margin — padding could not do this, because
+                `fill` positions against the padding box and would ignore it. */}
             <Link href={href} className='pc-pic'>
                 <span className='pc-pic-inner'>
                     <Image
@@ -227,8 +226,8 @@ const NewProductCard: React.FC<NewProductCardProps> = ({ product }) => {
             {/* ── Details ────────────────────────────────────────────────── */}
             <div className='pc-body relative mt-auto flex flex-1 flex-col gap-1.5 px-4 pb-4 pt-4'>
 
-                {/* The panel's top edge rises over the two controls instead of
-                    running straight past them — see .pc-notch in globals.css. */}
+                {/* Wishlist and compare, over the bottom-right corner of the
+                    picture — see .pc-notch in globals.css. */}
                 <div className='pc-notch'>
                     <button
                         onClick={handleWishlistToggle}
