@@ -49,6 +49,10 @@ const nextConfig: NextConfig = {
     dangerouslyAllowSVG: true,
     contentDispositionType: "attachment",
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    // Next 16 refuses to optimise images from localhost / private IPs. In local
+    // dev the API (and so every uploaded image) lives on localhost, so allow it
+    // there only; production images come from a public host and keep the block.
+    dangerouslyAllowLocalIP: process.env.NODE_ENV !== "production",
     remotePatterns: [
       {
         protocol: "https",

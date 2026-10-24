@@ -41,15 +41,6 @@ const PRIMARY_LINKS: { href: string; label: string; highlight?: boolean }[] = [
     { href: '/quotations', label: 'Request Product' },
 ];
 
-/** Row 4 — the announcement ticker. Edit this list to change what scrolls. */
-const TICKER: string[] = [
-    '🔥 Fresh stock in — same-day dispatch inside Dhaka',
-    '💥 Pay in 3 instalments on bKash — 0% interest',
-    '🚚 Free delivery on every order above ৳3,000',
-    '📦 7-day easy return, no questions asked',
-    '📍 Cash on delivery available nationwide',
-];
-
 const Header: React.FC = () => {
 
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -222,7 +213,7 @@ const Header: React.FC = () => {
                 }
             ` }} />
 
-            {/* Rows 1–3 share the charcoal backdrop; the ticker below sits on white. */}
+            {/* Rows 1–3 share the charcoal backdrop. */}
             <div className="dz-header-bg">
 
             {/* ═══════════ 1 · UTILITY BAR ═══════════
@@ -519,21 +510,6 @@ const Header: React.FC = () => {
                 </div>
             </div>
             </div>{/* /dz-header-bg */}
-
-            {/* ═══════════ 4 · ANNOUNCEMENT TICKER ═══════════
-                The list is rendered twice and the track slides exactly -50%, so the
-                second copy is under the cursor the moment the first runs out and the
-                loop never shows a seam. Pauses on hover; see globals.css. */}
-            <div className="hd-ticker relative w-full h-11 flex items-center overflow-hidden select-none">
-                <div className="flex items-center marquee-track w-max">
-                    {[...TICKER, ...TICKER].map((item, i) => (
-                        <span key={i}
-                            className="flex items-center gap-2 px-8 whitespace-nowrap shrink-0 justify-center border-r border-black/10 text-[13px] text-[#222]">
-                            {item}
-                        </span>
-                    ))}
-                </div>
-            </div>
         </header>
     );
 };

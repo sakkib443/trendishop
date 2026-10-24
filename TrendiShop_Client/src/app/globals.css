@@ -875,7 +875,7 @@ h6 {
   margin: 8px 0;
 }
 /* ═══════════════════════════════════════════════════════════════════
-   Storefront header — design tokens, backdrop and the announcement ticker.
+   Storefront header — design tokens and backdrop.
 
    The header takes the site font (Poppins) like everything else. If a
    header-only face is ever wanted again, note that the global
@@ -895,40 +895,18 @@ h6 {
 }
 
 
-/* ── Announcement ticker ──────────────────────────────────────────────
-   The track holds the item list twice over, so translating it exactly
-   -50% lands the copy where the original started and the loop is seamless.
-   Pausing on hover lets people actually read an offer they spotted. */
-@keyframes marquee-rtl {
-  0%   { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-
-.marquee-track {
-  animation: marquee-rtl 60s linear infinite;
-  will-change: transform;
-}
-
-.marquee-track:hover {
-  animation-play-state: paused;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .marquee-track { animation: none; }
-}
-
 /* ── Header backdrop ──────────────────────────────────────────────────
    The warm charcoal wash that sits behind rows 1–3. Reproduced as a
    gradient rather than a bitmap: it is three stops, so it costs nothing
    to download, stays sharp at any width and can be retuned from here.
 
    Sampled ramp: warm brown at the top, near-black through the middle,
-   fading out at the bottom so the ticker row below reads as light.
+   ending on a solid colour so the page below reads as light.
    The white pills inside (utility strip, search, action squares, the
    category rail) are cut-outs against it. */
 .dz-header-bg {
   /* Solid all the way down. The last stop used to fade to transparent, which
-     left a washed-out band above the ticker instead of an edge. The block now
+     left a washed-out band above the page instead of an edge. The block now
      ends on a definite colour and curves into the white below it. */
   background-image: linear-gradient(
     to bottom,
@@ -989,13 +967,6 @@ h6 {
 
 .hd-rail::-webkit-scrollbar {
   display: none;
-}
-
-/* Ticker: fade both ends so items arrive and leave instead of being
-   chopped off against the edge of the viewport. */
-.hd-ticker {
-  -webkit-mask-image: linear-gradient(to right, transparent, #000 64px, #000 calc(100% - 64px), transparent);
-  mask-image: linear-gradient(to right, transparent, #000 64px, #000 calc(100% - 64px), transparent);
 }
 
 /* ═══════════════════════════════════════════════════════════════════
