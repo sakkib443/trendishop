@@ -11,7 +11,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { decodeSlug, productPath } from '@/lib/productUrl';
 import {
     FiHeart, FiShoppingCart, FiMinus, FiPlus, FiCheckCircle,
-    FiStar, FiX, FiZoomIn, FiCopy, FiShare2, FiDownload,
+    FiStar, FiX, FiZoomIn, FiCopy, FiShare2, FiDownload, FiPlay,
     FiChevronUp, FiChevronDown, FiMessageSquare,
     FiEye, FiChevronRight, FiChevronLeft, FiSend,
     FiMapPin, FiTruck, FiDollarSign, FiRefreshCw, FiShield, FiClock, FiPhone
@@ -29,6 +29,7 @@ import { useWishlist } from '@/hooks/useWishlist';
 import { toast } from 'react-hot-toast';
 import NewProductCard, { CommentsPopup } from '@/components/shared/NewProductCard';
 import { getDisplayPrice } from '@/utils/offerPrice';
+import { youTubeId, youTubeEmbedUrl, youTubeThumbUrl } from '@/utils/productVideo';
 import {
     FaFacebookF, FaFacebookMessenger, FaWhatsapp, FaTelegramPlane,
     FaLinkedinIn, FaPinterestP, FaEnvelope, FaInstagram
@@ -48,6 +49,8 @@ export default function ProductDetailsPage() {
     const [incrementStat] = useIncrementProductStatMutation();
     const [quantity, setQuantity] = useState(1);
     const [selectedImage, setSelectedImage] = useState(0);
+    // True while the gallery's main box plays the product video instead of an image.
+    const [showVideo, setShowVideo] = useState(false);
     // An uploaded image whose file is missing on the server (e.g. it was lost in a
     // redeploy) would otherwise leave the gallery box blank — the card masks the
     // same case with a placeholder, so mirror that here instead of showing nothing.
@@ -123,6 +126,15 @@ export default function ProductDetailsPage() {
         { skip: !product?._id || !product?.category?._id }
     );
     const relatedProducts = relatedData?.data || [];
+
+    // Open on the video when the product has one and the admin chose "video first".
+    // Reset during render (not in an effect) whenever a different product loads.
+    const videoInitKey = product ? `${product._id}|${product.videoUrl || ''}|${product.mediaFirst || ''}` : '';
+    const [videoInitFor, setVideoInitFor] = useState('');
+    if (videoInitKey && videoInitKey !== videoInitFor) {
+        setVideoInitFor(videoInitKey);
+        setShowVideo(!!product.videoUrl && product.mediaFirst === 'video');
+    }
 
     // ViewContent / view_item — once per product opened, for the ad trackers.
     useEffect(() => {
@@ -312,6 +324,23 @@ export default function ProductDetailsPage() {
         return baseImages;
     })();
 
+    // The product video (uploaded file or YouTube link). Its thumbnail leads the
+    // strip when the admin chose "video first", and trails the images otherwise.
+    const videoUrl: string = product.videoUrl || '';
+    const videoYtId = youTubeId(videoUrl);
+    const videoFirst = product.mediaFirst === 'video';
+    const videoThumb = videoUrl ? (
+        <button key="video" onClick={() => setShowVideo(true)} aria-label="Play video"
+            style={{ position: 'relative', width: '60px', height: '60px', flexShrink: 0, border: showVideo ? '2px solid var(--color-primary)' : '2px solid #e5e7eb', borderRadius: '6px', cursor: 'pointer', overflow: 'hidden', padding: 0, background: '#111' }}>
+            {videoYtId
+                ? <img src={youTubeThumbUrl(videoYtId)} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                : <video src={videoUrl} muted preload="metadata" playsInline style={{ width: '100%', height: '100%', objectFit: 'cover', pointerEvents: 'none' }} />}
+            <span style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.3)', color: '#fff' }}>
+                <FiPlay size={18} style={{ fill: '#fff' }} />
+            </span>
+        </button>
+    ) : null;
+
     // Base-product offer respecting the validity window (offerStartDate/offerEndDate).
     // When the offer has expired or not yet started, the regular price is shown and no
     // discount applies. Variants carry their own pricing and are not gated by this window.
@@ -369,6 +398,7 @@ export default function ProductDetailsPage() {
     };
 
     const handleColorSelect = (colorName: string) => {
+        setShowVideo(false);
         if (selectedColor === colorName) {
             setSelectedColor('');
             setSelectedImage(0);
@@ -384,12 +414,14 @@ export default function ProductDetailsPage() {
     };
 
     const handleImageSelect = (imgIdx: number) => {
+        setShowVideo(false);
         setSelectedImage(imgIdx);
         const imgUrl = allImages[imgIdx];
         if (imgUrl && imageToColorMap[imgUrl]) setSelectedColor(imageToColorMap[imgUrl]);
     };
 
     const handleSizeSelect = (size: string) => {
+        setShowVideo(false);
         if (selectedSize === size) {
             setSelectedSize('');
             setSelectedImage(0);
@@ -474,24 +506,35 @@ export default function ProductDetailsPage() {
                         <div className="pd-col-gallery" style={{ flex: '0 0 40%', maxWidth: '40%', background: '#fff', borderRadius: '8px', border: '1px solid #e5e7eb', padding: '14px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
                             {/* Main Image */}
                             <div className="pd-image-wrapper" style={{ position: 'relative' }}>
-                                <button onClick={(e) => { e.stopPropagation(); if (selectedImage > 0) setSelectedImage(p => p - 1); }}
+                                <button onClick={(e) => { e.stopPropagation(); setShowVideo(false); if (selectedImage > 0) setSelectedImage(p => p - 1); }}
                                     style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.95)', border: '1px solid #e5e7eb', borderRadius: '50%', width: '30px', height: '30px', zIndex: 5, cursor: selectedImage === 0 ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 6px rgba(0,0,0,0.1)', opacity: selectedImage === 0 ? 0.3 : 1 }}>
                                     <FiChevronLeft size={15} color="#333" />
                                 </button>
-                                <button onClick={(e) => { e.stopPropagation(); if (selectedImage < allImages.length - 1) setSelectedImage(p => p + 1); }}
+                                <button onClick={(e) => { e.stopPropagation(); setShowVideo(false); if (selectedImage < allImages.length - 1) setSelectedImage(p => p + 1); }}
                                     style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.95)', border: '1px solid #e5e7eb', borderRadius: '50%', width: '30px', height: '30px', zIndex: 5, cursor: selectedImage >= allImages.length - 1 ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 6px rgba(0,0,0,0.1)', opacity: selectedImage >= allImages.length - 1 ? 0.3 : 1 }}>
                                     <FiChevronRight size={15} color="#333" />
                                 </button>
-                                <div className="pd-main-image-box" style={{ width: '100%', aspectRatio: '1/1', background: '#f8f9fa', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', position: 'relative', overflow: 'hidden', borderRadius: '6px', border: '1px solid #f0f0f0' }} onClick={() => setIsFullscreen(true)}>
-                                    {/* The gallery's main image — the heaviest thing on this page.
+                                <div className="pd-main-image-box" style={{ width: '100%', aspectRatio: '1/1', background: showVideo ? '#000' : '#f8f9fa', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: showVideo ? 'default' : 'pointer', position: 'relative', overflow: 'hidden', borderRadius: '6px', border: '1px solid #f0f0f0' }} onClick={() => { if (!showVideo) setIsFullscreen(true); }}>
+                                    {showVideo && videoUrl ? (
+                                        videoYtId ? (
+                                            <iframe src={youTubeEmbedUrl(videoYtId)} title={product.name}
+                                                allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowFullScreen
+                                                style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 0, zIndex: 3 }} />
+                                        ) : (
+                                            <video src={videoUrl} controls playsInline preload="metadata"
+                                                style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain', zIndex: 3 }} />
+                                        )
+                                    ) : (
+                                    /* The gallery's main image — the heaviest thing on this page.
                                         Its box is already `position: relative`, so `fill` leaves the
-                                        layout alone while Next serves it at display size. */}
+                                        layout alone while Next serves it at display size. */
                                     <Image src={safeSrc(allImages[selectedImage] || allImages[0])} alt={product.name}
                                         fill
                                         sizes="(max-width: 768px) 100vw, 520px"
                                         style={{ objectFit: 'cover', transition: 'transform 0.3s ease' }}
                                         onError={() => markBroken(allImages[selectedImage] || allImages[0])}
                                     />
+                                    )}
                                     <div style={{ position: 'absolute', bottom: '10px', right: '10px', background: 'var(--color-primary)', borderRadius: '50%', padding: '7px', color: '#fff', opacity: 0, transition: 'opacity 0.3s' }} className="zoom-indicator">
                                         <FiZoomIn size={16} />
                                     </div>
@@ -499,14 +542,14 @@ export default function ProductDetailsPage() {
                                         const currentDiscount = activeVariant
                                             ? (activeVariant.discount || (activeVariant.originalPrice && activeVariant.originalPrice > discountedPrice ? Math.round(((activeVariant.originalPrice - discountedPrice) / activeVariant.originalPrice) * 100) : 0))
                                             : (offerDisplay.discount || (product.originalPrice && product.originalPrice > product.price ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100) : 0));
-                                        if (!currentDiscount || currentDiscount <= 0) return null;
+                                        if (showVideo || !currentDiscount || currentDiscount <= 0) return null;
                                         return (
                                             <div className="discount-badge" style={{ position: 'absolute', top: '10px', left: '10px', background: 'var(--color-primary)', color: '#fff', fontSize: '11px', fontWeight: 700, padding: '3px 8px', borderRadius: '9999px', zIndex: 2, opacity: 1, transition: 'opacity 0.3s' }}>
                                                 -{currentDiscount}% Off
                                             </div>
                                         );
                                     })()}
-                                    {product.stock <= 5 && product.stock > 0 && (
+                                    {!showVideo && product.stock <= 5 && product.stock > 0 && (
                                         <div style={{ position: 'absolute', top: '10px', right: '10px', background: '#f59e0b', color: '#fff', fontSize: '10px', fontWeight: 700, padding: '3px 8px', borderRadius: '9999px', zIndex: 2 }} className="animate-pulse">
                                             Only {product.stock} left!
                                         </div>
@@ -518,12 +561,14 @@ export default function ProductDetailsPage() {
                             <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '12px' }}>
                                 <button onClick={() => scrollList(colorSwatchRef, 'up')} style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: '50%', cursor: 'pointer', padding: '4px', color: '#6b7280', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, width: '26px', height: '26px' }}><FiChevronLeft size={15} /></button>
                                 <div ref={colorSwatchRef} className="no-scrollbar pd-thumb-strip" style={{ display: 'flex', flexDirection: 'row', gap: '8px', overflowX: 'auto', overflowY: 'hidden', flex: 1, scrollBehavior: 'smooth' }}>
+                                    {videoFirst && videoThumb}
                                     {allImages.map((img: string, idx: number) => (
                                         <button key={idx} onClick={() => handleImageSelect(idx)} onMouseEnter={() => handleImageSelect(idx)}
-                                            style={{ width: '60px', height: '60px', flexShrink: 0, border: selectedImage === idx ? '2px solid var(--color-primary)' : '2px solid #e5e7eb', borderRadius: '6px', cursor: 'pointer', transition: 'all 0.2s ease', overflow: 'hidden', padding: 0, background: '#f5f5f5', boxShadow: selectedImage === idx ? '0 0 0 2px rgba(var(--color-primary-rgb), 0.15)' : 'none' }}>
+                                            style={{ width: '60px', height: '60px', flexShrink: 0, border: !showVideo && selectedImage === idx ? '2px solid var(--color-primary)' : '2px solid #e5e7eb', borderRadius: '6px', cursor: 'pointer', transition: 'all 0.2s ease', overflow: 'hidden', padding: 0, background: '#f5f5f5', boxShadow: selectedImage === idx ? '0 0 0 2px rgba(var(--color-primary-rgb), 0.15)' : 'none' }}>
                                             <Image src={safeSrc(img)} alt={`Product ${idx + 1}`} width={60} height={60} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={() => markBroken(img)} />
                                         </button>
                                     ))}
+                                    {!videoFirst && videoThumb}
                                 </div>
                                 <button onClick={() => scrollList(colorSwatchRef, 'down')} style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: '50%', cursor: 'pointer', padding: '4px', color: '#6b7280', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, width: '26px', height: '26px' }}><FiChevronRight size={15} /></button>
                             </div>

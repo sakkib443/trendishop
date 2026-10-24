@@ -54,6 +54,12 @@ const productSchema = new Schema(
         thumbnail: { type: String, default: '/images/placeholder-product.webp' },
         images:    [{ type: String }],
 
+        // ── Video ───────────────────────────────────────────────
+        // Either an uploaded file (/uploads/...) or a YouTube link. mediaFirst
+        // picks what the product page opens on when it has both.
+        videoUrl:   { type: String, default: '' },
+        mediaFirst: { type: String, enum: ['image', 'video'], default: 'image' },
+
 
         // ── Category ─────────────────────────────────────────────
         category:      { type: Schema.Types.ObjectId, ref: 'Category', default: null },

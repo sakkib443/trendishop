@@ -12,6 +12,7 @@ import 'react-quill-new/dist/quill.snow.css';
 import Link from 'next/link';
 import { SingleImageUploader, MultipleImageUploader } from '@/components/ui/ImageUploader';
 import AttributeValuePicker from '@/components/dashboard/AttributeValuePicker';
+import ProductVideoField from '@/components/dashboard/ProductVideoField';
 import {
     FiArrowLeft, FiSave, FiImage, FiX, FiPlus, FiInfo,
     FiSettings, FiDollarSign, FiTag, FiShield, FiTruck,
@@ -92,6 +93,7 @@ const ProductFormInner = ({ productId: propProductId }: { productId?: string }) 
         offerStartDate: '', offerEndDate: '',
         // Media
         thumbnail: '', images: [],
+        videoUrl: '', mediaFirst: 'image',
         // Organization
         category: '', subCategory: '', childCategory: '',
         // Specs (new)
@@ -1145,6 +1147,14 @@ const ProductFormInner = ({ productId: propProductId }: { productId?: string }) 
                             {errors.images && <p className="text-xs text-red-500 font-medium mt-1">⚠ {errors.images}</p>}
                         </div>
                     </div>
+
+                    {/* ── Product Video ─────────────────────────────── */}
+                    <ProductVideoField
+                        key={isDataLoaded ? 'loaded' : 'new'}
+                        videoUrl={formData.videoUrl || ''}
+                        mediaFirst={formData.mediaFirst === 'video' ? 'video' : 'image'}
+                        onChange={(patch) => setFormData((prev: any) => ({ ...prev, ...patch }))}
+                    />
 
                     {/* ── Category & Tags ───────────────────────────── */}
                     <div className="bg-white p-6 rounded-md border border-gray-200 shadow-sm space-y-4">
