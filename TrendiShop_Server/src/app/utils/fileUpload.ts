@@ -38,6 +38,26 @@ export const upload = multer({
     },
 });
 
+// ── Video upload — one product video, up to 100MB ───────────────────────────
+export const videoUpload = multer({
+    storage: multer.diskStorage({
+        destination: (_req, _file, cb) => cb(null, uploadsDir),
+        filename: (_req, file, cb) => {
+            const ext = (path.extname(file.originalname) || '.mp4').toLowerCase();
+            cb(null, `video_${Date.now()}_${Math.random().toString(36).substring(2, 8)}${ext}`);
+        },
+    }),
+    limits: { fileSize: 100 * 1024 * 1024 }, // 100MB
+    fileFilter: (_req, file, cb) => {
+        const allowed = ['video/mp4', 'video/webm', 'video/quicktime'];
+        if (allowed.includes(file.mimetype)) {
+            cb(null, true);
+        } else {
+            cb(new Error('Only video files are allowed (mp4, webm, mov)'));
+        }
+    },
+});
+
 // ── Resolve the public URL for an uploaded file ──────────────────────────────
 // Files are served by the /uploads static route, so the URL is just this API's
 // own origin plus the stored filename.

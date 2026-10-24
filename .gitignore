@@ -9,13 +9,10 @@ dist/
 *.tsbuildinfo
 
 # Secrets — only the .env.example templates are committed
-.env
-.env.*
 !.env.example
 
 # Local tooling
 .claude/
-.vscode/
 .idea/
 .DS_Store
 Thumbs.db
@@ -32,3 +29,4 @@ Thumbs.db
 branch_structure.json
 temp_auto_push.bat
 temp_interactive_push.bat
+config.bat

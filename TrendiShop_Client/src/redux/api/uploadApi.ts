@@ -23,6 +23,16 @@ export const uploadApi = baseApi.injectEndpoints({
             }),
         }),
 
+        // Upload one product video (admin / editor) — POST /api/upload/video
+        uploadVideo: builder.mutation<{ data: { url: string } }, FormData>({
+            query: (formData) => ({
+                url: '/upload/video',
+                method: 'POST',
+                body: formData,
+                formData: true,
+            }),
+        }),
+
         // Upload multiple images (authenticated user scope) — POST /api/upload/my-images
         uploadMyImages: builder.mutation<{ data: { urls: string[] } }, FormData>({
             query: (formData) => ({
@@ -39,4 +49,5 @@ export const {
     useUploadImageMutation,
     useUploadImagesMutation,
     useUploadMyImagesMutation,
+    useUploadVideoMutation,
 } = uploadApi;
