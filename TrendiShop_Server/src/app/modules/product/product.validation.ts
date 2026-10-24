@@ -29,6 +29,10 @@ const productCreateShape = z.object({
     thumbnail: z.string().optional(),
     images:    z.array(z.string()).optional(),
 
+    // Video — an uploaded file URL or a YouTube link; '' clears it
+    videoUrl:   z.string().max(500).optional(),
+    mediaFirst: z.enum(['image', 'video']).optional(),
+
     // Category — a product without one simply does not show up under any category.
     category:      z.string().optional(),
     subCategory:   z.string().optional(),

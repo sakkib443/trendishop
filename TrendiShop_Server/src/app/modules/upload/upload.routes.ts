@@ -1,6 +1,7 @@
 import express from 'express';
-import { upload } from '../../utils/fileUpload';
+import { upload, videoUpload } from '../../utils/fileUpload';
 import { uploadController } from './upload.controller';
+import { authMiddleware, authorizeRoles } from '../../middlewares/auth';
 
 const router = express.Router();
 
@@ -23,6 +24,15 @@ router.post(
     '/my-images',
     upload.array('images', 5),
     uploadController.uploadMultiple,
+);
+
+// POST /api/upload/video — one product video (admin / editor only: up to 100MB)
+router.post(
+    '/video',
+    authMiddleware,
+    authorizeRoles('admin', 'editor'),
+    videoUpload.single('video'),
+    uploadController.uploadSingle,
 );
 
 export const UploadRoutes = router;
