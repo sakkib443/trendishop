@@ -1,8 +1,11 @@
 @import "tailwindcss";
 
-/* ===== Google Fonts ===== */
+/* ===== Google Fonts =====
+   Poppins has no Bengali glyphs, so the browser falls through to Hind Siliguri
+   character by character: English stays Poppins, Bangla renders in Hind Siliguri,
+   even inside the same line. Hind Siliguri's Latin files never download. */
 * {
-  font-family: "Poppins", sans-serif !important;
+  font-family: "Poppins", "Hind Siliguri", sans-serif !important;
 }
 
 /* ===== CSS Variables System for Theme Customization ===== */
@@ -44,8 +47,8 @@
   --color-page: #F2F3F5;        /* app gray background behind cards */
 
   /* Typography */
-  --font-family: 'Poppins', sans-serif;
-  --font-heading: 'Poppins', sans-serif;
+  --font-family: 'Poppins', 'Hind Siliguri', sans-serif;
+  --font-heading: 'Poppins', 'Hind Siliguri', sans-serif;
   --font-size-xs: 0.75rem;
   --font-size-sm: 0.875rem;
   --font-size-base: 1rem;
@@ -781,7 +784,7 @@ h6 {
   border-radius: 8px 8px 0 0;
   background: #f8fafc;
   padding: 8px 12px;
-  font-family: 'Poppins', sans-serif !important;
+  font-family: 'Poppins', 'Hind Siliguri', sans-serif !important;
 }
 
 .product-editor-wrapper .ql-container.ql-snow {
@@ -789,7 +792,7 @@ h6 {
   border-top: none;
   border-radius: 0 0 8px 8px;
   min-height: 300px;
-  font-family: 'Poppins', sans-serif !important;
+  font-family: 'Poppins', 'Hind Siliguri', sans-serif !important;
   font-size: 14px;
   line-height: 1.8;
 }
@@ -806,7 +809,7 @@ h6 {
 }
 
 .product-editor-wrapper .ql-snow .ql-picker {
-  font-family: 'Poppins', sans-serif !important;
+  font-family: 'Poppins', 'Hind Siliguri', sans-serif !important;
 }
 
 .product-editor-wrapper .ql-toolbar .ql-formats {
