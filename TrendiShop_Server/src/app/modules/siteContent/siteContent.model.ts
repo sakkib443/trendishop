@@ -151,8 +151,16 @@ const siteContentSchema = new Schema({
     // ── Hero Slides ──
     heroSlides: [{
         imageUrl: { type: String, required: true },
+        link: { type: String, default: '' },
         active: { type: Boolean, default: true },
         order: { type: Number, default: 0 },
+    }],
+
+    // ── Hero Side Banner ── (the square panel right of the slides; the first active one is shown)
+    heroSide: [{
+        imageUrl: { type: String, required: true },
+        link: { type: String, default: '' },
+        active: { type: Boolean, default: true },
     }],
 
 }, { timestamps: true });

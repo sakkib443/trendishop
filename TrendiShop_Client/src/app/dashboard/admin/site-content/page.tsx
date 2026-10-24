@@ -56,6 +56,7 @@ export default function SiteContentPage() {
             const payload: any = {};
             if (activeTab === 'hero') {
                 payload.heroSlides = formData.heroSlides;
+                payload.heroSide = formData.heroSide || [];
             } else {
                 payload[activeTab] = formData[activeTab];
             }
@@ -612,6 +613,19 @@ function LegalPagesTab() {
 /* ─── HERO SLIDES TAB ─── */
 function HeroSlidesTab({ data, setData, onSave, isSaving }: { data: any; setData: any; onSave: () => void; isSaving: boolean }) {
     const slides = data.heroSlides || [];
+    // The square banner right of the slides. Stored as a list; the storefront shows the first active one.
+    const side = (data.heroSide || [])[0] || null;
+    const setSide = (patch: any) =>
+        setData((p: any) => {
+            const current = (p.heroSide || [])[0] || {};
+            const next = { ...current, active: true, ...patch };
+            return { ...p, heroSide: next.imageUrl ? [next] : [] };
+        });
+
+    const updateSlideLink = (idx: number, link: string) => {
+        const newSlides = slides.map((s: any, i: number) => (i === idx ? { ...s, link } : s));
+        setData((p: any) => ({ ...p, heroSlides: newSlides }));
+    };
 
     const addSlide = (imageUrl: string) => {
         if (!imageUrl) return;
@@ -642,7 +656,7 @@ function HeroSlidesTab({ data, setData, onSave, isSaving }: { data: any; setData
             {/* Info */}
             <div style={{ ...card, background: '#fffbeb', borderColor: '#fde68a' }}>
                 <p style={{ fontSize: '12px', color: '#b45309', fontWeight: 600, margin: 0 }}>
-                    🖼️ Hero slides appear at the top of your homepage as a banner carousel. Add multiple images and they will auto-rotate.
+                    🖼️ The homepage hero has two banners: the wide <strong>left slides</strong> (add several and they auto-rotate) and the square <strong>right banner</strong>. Leave one empty and the default image is shown.
                 </p>
             </div>
 
@@ -689,6 +703,14 @@ function HeroSlidesTab({ data, setData, onSave, isSaving }: { data: any; setData
                                         </button>
                                     </div>
                                 </div>
+                                <div style={{ padding: '0 8px 8px' }}>
+                                    <input
+                                        value={slide.link || ''}
+                                        onChange={(e) => updateSlideLink(idx, e.target.value)}
+                                        placeholder="Link (e.g. /products)"
+                                        style={{ ...input, padding: '6px 8px', fontSize: '12px' }}
+                                    />
+                                </div>
                             </div>
                         ))}
                     </div>
@@ -697,15 +719,39 @@ function HeroSlidesTab({ data, setData, onSave, isSaving }: { data: any; setData
 
             {/* Add New Slide */}
             <div style={card}>
-                <h3 style={{ fontSize: '14px', fontWeight: 700, margin: '0 0 6px' }}>Add New Slide</h3>
+                <h3 style={{ fontSize: '14px', fontWeight: 700, margin: '0 0 6px' }}>Left Banner — Add New Slide</h3>
                 <p style={{ fontSize: '11px', color: '#888', margin: '0 0 12px' }}>
-                    Upload a high-quality banner image (recommended: 1920×540px or 16:4.5 ratio)
+                    Wide banner on the left. Recommended size: 1672×856px.
                 </p>
                 <SingleImageUploader
                     label="Slide Image"
                     value=""
                     onChange={(url) => { if (url) addSlide(url); }}
                 />
+            </div>
+
+            {/* Right Side Banner */}
+            <div style={card}>
+                <h3 style={{ fontSize: '14px', fontWeight: 700, margin: '0 0 6px' }}>Right Banner</h3>
+                <p style={{ fontSize: '11px', color: '#888', margin: '0 0 12px' }}>
+                    Square banner on the right. Recommended size: 1254×1140px (about 1:0.91). Remove it to show the default image.
+                </p>
+                <SingleImageUploader
+                    label="Right Banner Image"
+                    value={side?.imageUrl || ''}
+                    onChange={(url) => setSide({ imageUrl: url || '' })}
+                />
+                {side?.imageUrl && (
+                    <div style={{ marginTop: '12px' }}>
+                        <label style={label}>Link</label>
+                        <input
+                            value={side.link || ''}
+                            onChange={(e) => setSide({ link: e.target.value })}
+                            placeholder="/products?category=phones"
+                            style={input}
+                        />
+                    </div>
+                )}
             </div>
 
             {/* Save Button */}
