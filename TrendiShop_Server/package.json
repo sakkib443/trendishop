@@ -7,11 +7,11 @@
     "node": ">=20.0.0"
   },
   "scripts": {
-    "start": "node init && node ./dist/src/server.js",
-    "start:prod": "node init && node ./dist/src/server.js",
-    "start:dev": "node init && ts-node-dev --respawn --transpile-only src/server.ts",
+    "start": "node ./dist/src/server.js",
+    "start:prod": "node ./dist/src/server.js",
+    "start:dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "seed": "ts-node --transpile-only src/seed.ts",
-    "build": "node init && tsc",
+    "build": "tsc",
     "vercel-build": "tsc",
     "lint": "eslint src --ignore-path .eslintignore --ext .ts",
     "lint:fix": "npx eslint src --fix",
